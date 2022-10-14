@@ -27,3 +27,22 @@ const char* mapTileTypeToChar[NUMBER_OF_TILE_TYPES] = {
 
 
 struct Tile map[MAP_HEIGHT][MAP_WIDTH];
+
+//Functions
+
+// main.c
+
+// game.c
+
+
+// generation.c
+void generateMap();
+
+// io.c
+void init_Ncurses();
+void printMap();
+
+// network.c
+
+
+// misc.c
