@@ -21,12 +21,10 @@ struct Tile {
 };
 
 
-const char* mapTileTypeToChar[NUMBER_OF_TILE_TYPES] = {
-    "#",
-};
+extern const char* mapTileTypeToChar[NUMBER_OF_TILE_TYPES];
 
 
-struct Tile map[MAP_HEIGHT][MAP_WIDTH];
+extern struct Tile map[MAP_HEIGHT][MAP_WIDTH];
 
 //Functions
 
@@ -39,7 +37,7 @@ struct Tile map[MAP_HEIGHT][MAP_WIDTH];
 void generateMap();
 
 // io.c
-void init_Ncurses();
+void initNcurses();
 void printMap();
 
 // network.c
