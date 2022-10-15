@@ -20,6 +20,10 @@ int main(int argc, char *argv[]) {
         initServer(&server);
         isServer = true;
     } else if (strcmp(argv[1], "-C") == 0) {
+        if (argc != 3) {
+            printf("Invalid Arguments\n");
+            return 1;
+        }
         initClient(&connection1, argv[2]);
         isServer = false;
     } else {
