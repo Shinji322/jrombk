@@ -1,4 +1,9 @@
 #include "jrombk.h"
+#include <time.h>
+
+#define MS_PER_FRAME (CLOCKS_PER_SEC / 60)
+
+clock_t frameStart;
 
 int main() {
 
@@ -14,12 +19,18 @@ int main() {
 
     int command = 0;
     while (command != 'q') {
+        frameStart = clock();
         command = getch();
         if (command == 'r') {
             generateMap();
         }
         gameLoop(command, 0);
         printScreen();
+
+        clock_t frameLen = 0;
+        do {
+            frameLen = clock() - frameStart; 
+        } while (frameLen < MS_PER_FRAME);
     }
 
     endwin();
