@@ -34,14 +34,14 @@ typedef struct ClientConnection {
     struct hostent *he;
     int socket_fd,num;
     char buffer[1024];
-    char bufferIn[MAP_HEIGHT * MAP_WIDTH * 2];
+    //char bufferIn[MAP_HEIGHT * MAP_WIDTH * 2];
 } ClientConnection;
 
 void initServer(ServerConnection* main);
 
 int networkGetch(ServerConnection* main, bool isPlayerOne);
 
-int sendServerData(ServerConnection* main, bool isPlayerOne)
+void sendServerData(ServerConnection* main, bool isPlayerOne);
 
 void closeServer(ServerConnection* main);
 

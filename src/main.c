@@ -61,6 +61,10 @@ int main(int argc, char *argv[]) {
             gameLoop(command1, command2);
             printScreen(false);
             printScreenCharArray();
+
+            sendServerData(&server, true);
+            sendServerData(&server, false);
+
             mvprintw(0, 0, "%i", command1);
             mvprintw(1, 0, "%i", command0);
 
@@ -80,6 +84,8 @@ int main(int argc, char *argv[]) {
             if (command1 != ERR) {
                 clientPut(&connection, command1);
             }
+           
+            receiveServerData(&connection);
             
             printScreenCharArray();
         }

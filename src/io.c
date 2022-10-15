@@ -147,3 +147,7 @@ void printScreenCharArray() {
         }
     }
 }
+
+char* getScreenArray() {
+    return &screenAsChar[0][0][0];
+}

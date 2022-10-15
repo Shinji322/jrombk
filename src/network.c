@@ -1,4 +1,5 @@
 #include "network.h"
+#include "io.h"
 #include <curses.h>
 
 void initServer(ServerConnection* main){
@@ -61,36 +62,28 @@ int networkGetch(ServerConnection* main, bool isPlayerOne) {
         if ((main->num = recv(main->client1_fd, main->buffer, 4, /*MSG_DONTWAIT*/ 0)) == -1) {
             return 0; 
         }
-    }
-    else{
+    } else {
         if ((main->num = recv(main->client2_fd, main->buffer, 4, /*MSG_DONTWAIT*/ 0)) == -1) {
             return 0; 
         }
-   }
-        return ((((int)main->buffer[2]) << 16) | (((int)main->buffer[1]) << 8) | ((int) main->buffer[0]));
+    }
+    return ((((int)main->buffer[2]) << 16) | (((int)main->buffer[1]) << 8) | ((int) main->buffer[0]));
 }
 
-int sendServerData(ServerConnection* main, bool isPlayerOne){
-    main->buffer[main->num] = '\0'; //is it righ to use the same buffer here?
-     
+void sendServerData(ServerConnection* main, bool isPlayerOne){
+    char* buff = getScreenArray();
     if(isPlayerOne){
-        if ((send(main->client1_fd,main->buffer, strlen(main->buffer),0))== -1){
+        if ((send(main->client1_fd, buff, MAP_HEIGHT * MAP_WIDTH * 2,0))== -1){
             fprintf(stderr, "Failure Sending Message\n");
-            close(main->client_fd);
-            return 0;
+            close(main->client1_fd);
         }
     }
     else{
-        if ((send(main->client2_fd,main->buffer, strlen(main->buffer),0))== -1){
+        if ((send(main->client2_fd, buff, MAP_HEIGHT * MAP_WIDTH * 2,0))== -1){
             fprintf(stderr, "Failure Sending Message\n");
-            close(main->client_fd);
-            return 0;
+            close(main->client2_fd);
         }
     }
-
-    return ("Server:Msg being sent: %s\nNumber of bytes sent: %d\n",main->buffer, strlen(main->buffer))); // change this to what you wnat
-
-
 }
 
 void closeServer(ServerConnection* main) {
@@ -133,17 +126,13 @@ void clientPut(ClientConnection* main, int data) {
 
     if ((send(main->socket_fd,main->buffer, /*strlen(main->buffer)*/ 4,0))== -1) {
             fprintf(stderr, "Failure Sending Message\n");
-            close(main->socket_fd);
-            exit(1);
     }
 }
 
 void receiveServerData(ClientConnection* main){
-    int temp;
-    if(temp = recv(socket_fd, main->bufferIn, sizeof(main->bufferIn),0) <= 0){
+    char* buff = getScreenArray();
+    if(recv(main->socket_fd, buff, MAP_HEIGHT * MAP_WIDTH * 2,0) <= 0){
         printf("Either Connection Closed or Error\n");
-        break;
-
     }
 }
 
