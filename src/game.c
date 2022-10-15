@@ -1,4 +1,5 @@
 #include "game.h"
+#include <curses.h>
 
 
 void movePlayer(MoveDirection direction, Player* player) {
@@ -99,6 +100,16 @@ void removeBomb(Bomb* bomb) {
     bomb->isBlowing = false;
     bomb->isPlaced = false;
     map[bomb->y][bomb->x].bomb = &noneBomb;
+
+
+    for (int y = 0; y < MAP_HEIGHT; y++) {
+        for (int x = 0; x < MAP_WIDTH; x++) {
+            double currentDistanceFromCenter = sqrt(pow((x - bomb->x)/2, 2) + pow(y - bomb->y, 2));
+            if (bomb->radius >= currentDistanceFromCenter) {
+                map[y][x].isWall = 0;
+            }
+        }
+    }
 }
 
 void handlePlayerBombs(Player* player) {

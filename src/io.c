@@ -48,7 +48,11 @@ void printMap() {
     for (int y = 0; y < MAP_HEIGHT; y++) {
         for (int x = 0; x < MAP_WIDTH; x++) {
             attron(COLOR_PAIR(tileTypeToColor[map[y][x].type]));
-            mvprintw(y, x, mapTileTypeToChar[map[y][x].type]);
+            if (map[y][x].isWall) {
+                mvprintw(y, x, "#");
+            } else {
+                mvprintw(y, x, mapTileTypeToChar[map[y][x].type]);
+            }
         }
     }
     attrset(A_NORMAL);
