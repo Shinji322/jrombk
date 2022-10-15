@@ -92,8 +92,28 @@ bool shouldBombBlow(Bomb* bomb) {
     return (bomb->startCycles + bomb->cyclesToBlow <= frameStart);
 }
 
+void loseHealth(Player* player) {
+    player->lives--;
+    if (player->lives <= 0) {
+        player->isDead = 1;
+    }
+}
+
 void blowBomb(Bomb* bomb) {
     bomb->isBlowing = 1;
+
+    for (int y = 0; y < MAP_HEIGHT; y++) {
+        for (int x = 0; x < MAP_WIDTH; x++) {
+            float distPlayer1 = sqrt(pow((player1.x - bomb->x)/2, 2) + pow(player1.y - bomb->y, 2));
+            float distPlayer2 = sqrt(pow((player2.x - bomb->x)/2, 2) + pow(player2.y - bomb->y, 2));
+            if (bomb->radius >= distPlayer1) {
+                loseHealth(&player1);
+            }
+            if (bomb->radius >= distPlayer2) {
+                loseHealth(&player2);
+            }
+        }
+    }
 }
 
 void removeBomb(Bomb* bomb) {
@@ -158,4 +178,11 @@ void gameLoop(int input1, int input2) {
 
     handlePlayerBombs(&player1);
     handlePlayerBombs(&player2);
+
+    if (player1.isDead) {
+
+    }
+    if (player2.isDead) {
+
+    }
 }

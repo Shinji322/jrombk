@@ -1,12 +1,12 @@
 #pragma once
 #include "jrombk.h"
 
-#define PLAYER_SPRITE '@'
+#define PLAYER_SPRITE "@"
 
 typedef struct Player {
     char sprite;
-    float health;
-    float speed;
+    int lives;
+    int isDead;
     int color;
     Bomb bombs[3];
     int y;
@@ -24,4 +24,4 @@ typedef enum MoveDirection {
 extern Player player1;
 extern Player player2;
 
-void createPlayer(Player *player, float health, int color, int x, int y);
+void createPlayer(Player *player, int health, int color, int x, int y);
