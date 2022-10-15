@@ -38,7 +38,7 @@ void movePlayer(MoveDirection direction, Player* player) {
     map[player->y][player->x].hasPlayer = 0;
     player->x = x;
     player->y = y;
-    tile.hasPlayer = 1;
+    map[y][x].hasPlayer = 1;
 }
 
 
