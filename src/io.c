@@ -170,7 +170,7 @@ void printTitle() {
 }
 
 
-void printGameOver() {
+void printGameOver(Player* player) {
     char losebuf[][45] = {
         "     .-:.     ::-.   ...      ...    :::     ",
         "      ';;.   ;;;;'.;;;;;;;.   ;;     ;;;     ",
@@ -200,10 +200,21 @@ void printGameOver() {
         "           'M 'M'    MMM  MMM     YM MM      "
     };
 
-
-    if (player1.isDead) {  // Player 2 wins
-
-    } else if (player2.isDead) { // Player 1 wins
-
+    if (player->isDead) {
+        for (int y = 0; y < MAP_HEIGHT; y++) {
+            for (int x = 0; x < MAP_WIDTH; x++) {
+                // attron(COLOR_PAIR(screenAsChar[1][y][x]));
+                mvprintWrapper(0, y, x, "%c", losebuf[y][x]);
+                // attrset(A_NORMAL);
+            }
+        }
+    } else {
+        for (int y = 0; y < MAP_HEIGHT; y++) {
+            for (int x = 0; x < MAP_WIDTH; x++) {
+                // attron(COLOR_PAIR(screenAsChar[1][y][x]));
+                mvprintWrapper(0, y, x, "%c", winbuf[y][x]);
+                // attrset(A_NORMAL);
+            }
+        }
     }
 }
