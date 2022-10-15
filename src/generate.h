@@ -1,10 +1,10 @@
 #pragma once
 #include "jrombk.h"
 
-#define MAP_HEIGHT 24
-#define MAP_WIDTH 80
+#define MAP_HEIGHT 40
+#define MAP_WIDTH 120
 
-#define MAP_RADIUS 10
+#define MAP_RADIUS 16
 
 
 #define NUMBER_OF_TILE_TYPES 7

@@ -1,4 +1,17 @@
+#include "generate.h"
 #include "jrombk.h"
+#include <curses.h>
+
+
+const int tileTypeToColor[NUMBER_OF_TILE_TYPES] = {
+    COLOR_BLACK,
+    COLOR_GREEN,
+    COLOR_BLUE,
+    COLOR_MAGENTA,
+    COLOR_YELLOW,
+    COLOR_RED,
+    COLOR_WHITE
+};
 
 void initColor(){
     // Alow the use of color
@@ -35,7 +48,9 @@ void initNcurses(){
 void printMap() {
     for (int y = 0; y < MAP_HEIGHT; y++) {
         for (int x = 0; x < MAP_WIDTH; x++) {
+            attron(COLOR_PAIR(tileTypeToColor[map[y][x].type]));
             mvprintw(y, x, mapTileTypeToChar[map[y][x].type]);
         }
     }
+    attrset(A_NORMAL);
 }

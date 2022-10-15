@@ -1,5 +1,4 @@
 #include "jrombk.h"
-#include <curses.h>
 
 
 
@@ -7,12 +6,18 @@ int main() {
 
     initNcurses();
 
+    srand(time(NULL));
+
     generateMap();
 
-    printMap();
 
-    while (getch() != 'q') {
-        mvprintw(0,0, "hi");
+    char command = 0;
+    while (command != 'q') {
+        command = getch();
+        if (command == 'r') {
+            generateMap();
+        }
+        printMap();
     }
 
     endwin();
