@@ -1,4 +1,5 @@
 #pragma once
+#include "bombs.h"
 #include "jrombk.h"
 
 #define MAP_HEIGHT 40
@@ -23,6 +24,8 @@ typedef struct Tile {
     int y;
     int x;
     int hasPlayer;
+    Bomb* bomb;
+    int isWall;
     TileType type;
 } Tile;
 

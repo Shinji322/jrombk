@@ -1,6 +1,7 @@
 #include "generate.h"
 #include "jrombk.h"
 #include "player.h"
+#include <time.h>
 #include <ncurses.h>
 
 
@@ -43,6 +44,14 @@ void movePlayer(MoveDirection direction, Player* player) {
     tile.hasPlayer = 1;
 }
 
+
+void dropBomb(Player* player) {
+    int x = player->x;
+    int y = player->y;
+    Tile tile = map[y][x];
+}
+
+
 void handlePlayerInput(int cmd, Player* player) {
     switch (cmd) {
         case KEY_UP:
@@ -57,6 +66,12 @@ void handlePlayerInput(int cmd, Player* player) {
         case KEY_RIGHT:
             movePlayer(RIGHT, player);
             break;
+        case 'b':
+            dropBomb(player);
+            break;
+        // case 'w':
+        //     placeWall(player);
+        //     break;
     }
 }
 

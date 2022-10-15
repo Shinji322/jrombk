@@ -1,4 +1,5 @@
 #pragma once
+#include "generate.h"
 #include "jrombk.h"
 
 #define PLAYER_SPRITE '@'
@@ -8,6 +9,7 @@ typedef struct Player {
     float health;
     float speed;
     int color;
+    Bomb bombs[3];
     int y;
     int x;
 } Player;
