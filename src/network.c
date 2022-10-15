@@ -2,14 +2,16 @@
 #include <curses.h>
 
 void initServer(ServerConnection* main){
+    int socket1;
+    int socket2;
     int yes =1;
 
-    if ((main->socket_fd = socket(AF_INET, SOCK_STREAM, 0))== -1) {
+    if ((main->socket_fd = socket(AF_INET, SOCK_STREAM, 0))== -1) { //makes master socket
         fprintf(stderr, "Socket failure!!\n");
         exit(1);
     }
 
-    if (setsockopt(main->socket_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
+    if (setsockopt(main->socket_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) { //tells socket to allow multiple connections
         perror("setsockopt");
         exit(1);
     }
@@ -19,39 +21,56 @@ void initServer(ServerConnection* main){
 
 
 
-    main->server.sin_family = AF_INET;
-    main->server.sin_port = htons(PORT);
-    main->server.sin_addr.s_addr = INADDR_ANY; 
+    main->server.sin_family = AF_INET; // sets ipv4 access
+    main->server.sin_port = htons(PORT); //set port number
+    main->server.sin_addr.s_addr = INADDR_ANY; //no ip blacklist 
 
-    if ((bind(main->socket_fd, (struct sockaddr *)&main->server, sizeof(struct sockaddr )))== -1)    { //sizeof(struct sockaddr) 
+    if ((bind(main->socket_fd, (struct sockaddr *)&main->server, sizeof(struct sockaddr )))== -1)    { //binds master socket 
         fprintf(stderr, "Binding Failure\n");
         exit(1);
     }
 
-    if ((listen(main->socket_fd, BACKLOG))== -1){
+    if ((listen(main->socket_fd, BACKLOG))< 0){ //tells socket to listen to port, BACKLOG is # of concurrent connection
         fprintf(stderr, "Listening Failure\n");
         exit(1);
     }
 
     
-    main->size = sizeof(struct sockaddr_in);
-    if ((main->client_fd = accept(main->socket_fd, (struct sockaddr *)&main->dest, &main->size))==-1 ) {
-    //if ((main->client_fd = accept(main->socket_fd, NULL, NULL))==-1 ) {
+    main->size = sizeof(struct sockaddr_in); //sets size to construc size
+    if ((main->client1_fd = accept(main->socket_fd, (struct sockaddr *)&main->dest, &main->size))==-1 ) {
         perror("accept");
         exit(1);
     }
+    else{
+        printf("Player 1 Connected at %s\n", inet_ntoa(main->dest.sin_addr));
+    }
 
-    printf("Server got connection from client %s\n", inet_ntoa(main->dest.sin_addr));
+    if ((main->client2_fd = accept(main->socket_fd, (struct sockaddr *)&main->dest, &main->size))==-1 ) {
+        perror("accept");
+        exit(1);
+    }
+    else{        
+        printf("Player 1 Connected at %s\n", inet_ntoa(main->dest.sin_addr));
+    }
 
-    fcntl(main->client_fd, F_SETFL, fcntl(main->client_fd, F_GETFL, 0) | O_NONBLOCK);    
+   
+    fcntl(main->client1_fd, F_SETFL, fcntl(main->client1_fd, F_GETFL, 0) | O_NONBLOCK);
+    fcntl(main->client2_fd, F_SETFL, fcntl(main->client2_fd, F_GETFL, 0) | O_NONBLOCK);  
 }
 
-int networkGetch(ServerConnection* main) {
+int networkGetch(ServerConnection* main, bool isPlayerOne) {
     //main->num = recv(main->client_fd, main->buffer, 4, /*MSG_DONTWAIT*/ 0);
     //mvprintw(0, 0, "Hi:%s", main->buffer);
-    if ((main->num = recv(main->client_fd, main->buffer, 4, /*MSG_DONTWAIT*/ 0)) == -1) {
-        return 0; 
+    if(isPlayerOne){
+        if ((main->num = recv(main->client1_fd, main->buffer, 4, /*MSG_DONTWAIT*/ 0)) == -1) {
+            return 0; 
+        }
     }
+    else{
+        if ((main->num = recv(main->client2_fd, main->buffer, 4, /*MSG_DONTWAIT*/ 0)) == -1) {
+            return 0; 
+        }
+   }
     //main->buffer[main->num] = '\0';
     //else if (main->num == 0) {
     //    printf("Connection closed\n");
@@ -71,7 +90,8 @@ int networkGetch(ServerConnection* main) {
 }
 
 void closeServer(ServerConnection* main) {
-    close(main->client_fd);
+    close(main->client1_fd);
+    close(main->client2_fd);
     close(main->socket_fd);
 }
 
