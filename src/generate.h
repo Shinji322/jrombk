@@ -9,11 +9,11 @@
 
 #define NUMBER_OF_TILE_TYPES 7
 
-struct Tile {
+typedef struct Tile {
     int y;
     int x;
     int type;
-};
+} Tile;
 
 typedef enum TileType {
     NONE,
