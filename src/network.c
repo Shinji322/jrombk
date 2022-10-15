@@ -57,8 +57,6 @@ void initServer(ServerConnection* main){
 }
 
 int networkGetch(ServerConnection* main, bool isPlayerOne) {
-    //main->num = recv(main->client_fd, main->buffer, 4, /*MSG_DONTWAIT*/ 0);
-    //mvprintw(0, 0, "Hi:%s", main->buffer);
     if(isPlayerOne){
         if ((main->num = recv(main->client1_fd, main->buffer, 4, /*MSG_DONTWAIT*/ 0)) == -1) {
             return 0; 
@@ -69,22 +67,30 @@ int networkGetch(ServerConnection* main, bool isPlayerOne) {
             return 0; 
         }
    }
-    //main->buffer[main->num] = '\0';
-    //else if (main->num == 0) {
-    //    printf("Connection closed\n");
-    //    return 0;
-    //}
+        return ((((int)main->buffer[2]) << 16) | (((int)main->buffer[1]) << 8) | ((int) main->buffer[0]));
+}
 
-    //printf("Server:Msg Received %s\n", main->buffer);
-    //return (int) main->buffer[0]; 
-    return ((((int)main->buffer[2]) << 16) | (((int)main->buffer[1]) << 8) | ((int) main->buffer[0]));
+int sendServerData(ServerConnection* main, bool isPlayerOne){
+    main->buffer[main->num] = '\0'; //is it righ to use the same buffer here?
+     
+    if(isPlayerOne){
+        if ((send(main->client1_fd,main->buffer, strlen(main->buffer),0))== -1){
+            fprintf(stderr, "Failure Sending Message\n");
+            close(main->client_fd);
+            return 0;
+        }
+    }
+    else{
+        if ((send(main->client2_fd,main->buffer, strlen(main->buffer),0))== -1){
+            fprintf(stderr, "Failure Sending Message\n");
+            close(main->client_fd);
+            return 0;
+        }
+    }
 
-    //if ((send(main->client_fd,main->buffer, strlen(main->buffer),0))== -1){
-    //    fprintf(stderr, "Failure Sending Message\n");
-    //    close(main->client_fd);
-    //    return 0;
-    //}
-    //printf("Server:Msg being sent: %s\nNumber of bytes sent: %d\n",main->buffer, strlen(main->buffer));
+    return ("Server:Msg being sent: %s\nNumber of bytes sent: %d\n",main->buffer, strlen(main->buffer)));
+
+
 }
 
 void closeServer(ServerConnection* main) {
