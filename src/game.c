@@ -27,7 +27,7 @@ void movePlayer(MoveDirection direction, Player* player) {
     }
 
     Tile tile = map[y][x];
-    if (tile.type == NONE || tile.type == WALL) {
+    if (tile.type == NONE || tile.type == WALL || tile.isWall) {
         return;
     }
     if (tile.hasPlayer) {
@@ -38,6 +38,16 @@ void movePlayer(MoveDirection direction, Player* player) {
     player->x = x;
     player->y = y;
     tile.hasPlayer = 1;
+}
+
+
+void placeWall(Player* player) {
+    int x = player->x;
+    int y = player->y;
+    if (map[y][x].type == WATER || map[y][x].type == LAVA) {
+        return;
+    }
+    map[y][x].isWall = 1;
 }
 
 
@@ -124,9 +134,9 @@ void handlePlayerInput(int cmd, Player* player) {
         case 'b':
             dropBomb(player);
             break;
-        // case 'w':
-        //     placeWall(player);
-        //     break;
+        case 'v':
+            placeWall(player);
+            break;
     }
 }
 
