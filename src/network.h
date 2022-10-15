@@ -38,7 +38,7 @@ typedef struct ClientConnection {
 
 void initServer(ServerConnection* main);
 
-int networkGetch(ServerConnection* main);
+int networkGetch(ServerConnection* main, bool isPlayerOne);
 
 void closeServer(ServerConnection* main);
 
