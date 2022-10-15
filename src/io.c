@@ -125,7 +125,7 @@ void printPlayerBombs(Player* player, bool toScreen) {
 void printPlayer(Player* player, bool toScreen) {
     //attron(COLOR_PAIR(player->color));
     screenAsCharColor[player->y][player->x] = player->color;
-    mvprintWrapper(toScreen, player->y, player->x, "@"); 
+    mvprintWrapper(toScreen, player->y, player->x, "%c", player->sprite); 
     //attrset(A_NORMAL);
 }
 

@@ -2,8 +2,6 @@
 #include <curses.h>
 
 void initServer(ServerConnection* main){
-    int socket1;
-    int socket2;
     int yes =1;
 
     if ((main->socket_fd = socket(AF_INET, SOCK_STREAM, 0))== -1) { //makes master socket
@@ -50,7 +48,7 @@ void initServer(ServerConnection* main){
         exit(1);
     }
     else{        
-        printf("Player 1 Connected at %s\n", inet_ntoa(main->dest.sin_addr));
+        printf("Player 2 Connected at %s\n", inet_ntoa(main->dest.sin_addr));
     }
 
    

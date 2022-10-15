@@ -13,24 +13,20 @@ int main(int argc, char *argv[]) {
     }
 
     bool isServer = true;
-    ServerConnection server1;
-    ServerConnection server2;
+    ServerConnection server;
     ClientConnection connection;
 
     if (strcmp(argv[1], "-S") == 0) {
-        initServer(&server1);
+        initServer(&server);
         //initServer(&server2);
         isServer = true;
     } else if (strcmp(argv[1], "-C") == 0) {
-<<<<<<< HEAD
         initClient(&connection, argv[2]);
-=======
         if (argc != 3) {
             printf("Invalid Arguments\n");
             return 1;
         }
-        initClient(&connection1, argv[2]);
->>>>>>> 5bf64eb33e3488e893fffe0d49b19ed7c3318722
+        initClient(&connection, argv[2]);
         isServer = false;
     } else {
         return 1;
@@ -56,39 +52,25 @@ int main(int argc, char *argv[]) {
             frameStart = clock();
             command0 = getch();
 
-<<<<<<< HEAD
-            command1 = networkGetch(&server1);
-            //command2 = networkGetch(&server2);
-=======
             command1 = networkGetch(&server, true);
             command2 = networkGetch(&server, false);
-
->>>>>>> 5bf64eb33e3488e893fffe0d49b19ed7c3318722
 
             if (command0 == 'r') {
                 generateMap();
             }
 
-<<<<<<< HEAD
-            gameLoop(command1, command0);
+            gameLoop(command1, command2);
             printScreen(false);
             printScreenCharArray();
             mvprintw(0, 0, "%i", command1);
             mvprintw(1, 0, "%i", command0);
-=======
-            gameLoop(command1, command2);
-            printScreen();
-            mvprintw(1, 0, "%i", command1);
-            mvprintw(1, 0, "%i", command2);
->>>>>>> 5bf64eb33e3488e893fffe0d49b19ed7c3318722
 
             clock_t frameLen = 0;
             do {
                 frameLen = clock() - frameStart; 
             } while (frameLen < MS_PER_FRAME);
         }
-        closeServer(&server1);
-        closeServer(&server2);
+        closeServer(&server);
     } else {
         while (command1 != 'q') {
             //do {
