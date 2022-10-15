@@ -4,9 +4,8 @@
 //#include <libioP.h>
 
 
-char screenAsChar[MAP_HEIGHT][MAP_WIDTH];
 
-char screenAsCharColor[MAP_HEIGHT][MAP_WIDTH] = {COLOR_WHITE};
+char screenAsChar[2][MAP_HEIGHT][MAP_WIDTH] = {COLOR_WHITE};
 
 const int tileTypeToColor[NUMBER_OF_TILE_TYPES] = {
     COLOR_BLACK,
@@ -67,7 +66,7 @@ void mvprintWrapper(bool toScreen, int y, int x, const char* format, ...) {
         done = vsprintf(s, format, arg);
         va_end (arg);
 
-        screenAsChar[y][x] = s[0];
+        screenAsChar[0][y][x] = s[0];
     }
 }
 
@@ -76,7 +75,7 @@ void printMap(bool toScreen) {
     for (int y = 0; y < MAP_HEIGHT; y++) {
         for (int x = 0; x < MAP_WIDTH; x++) {
             //attron(COLOR_PAIR(tileTypeToColor[map[y][x].type]));
-            screenAsCharColor[y][x] = tileTypeToColor[map[y][x].type];
+            screenAsChar[1][y][x] = tileTypeToColor[map[y][x].type];
             if (map[y][x].isWall) {
                 mvprintWrapper(toScreen, y, x, "#");
             } else {
@@ -124,7 +123,7 @@ void printPlayerBombs(Player* player, bool toScreen) {
 
 void printPlayer(Player* player, bool toScreen) {
     //attron(COLOR_PAIR(player->color));
-    screenAsCharColor[player->y][player->x] = player->color;
+    screenAsChar[1][player->y][player->x] = player->color;
     mvprintWrapper(toScreen, player->y, player->x, "%c", player->sprite); 
     //attrset(A_NORMAL);
 }
@@ -142,8 +141,8 @@ void printScreen(bool toScreen) {
 void printScreenCharArray() {
     for (int y = 0; y < MAP_HEIGHT; y++) {
         for (int x = 0; x < MAP_WIDTH; x++) {
-            attron(COLOR_PAIR(screenAsCharColor[y][x]));
-            mvprintw(y,x, "%c", screenAsChar[y][x]);
+            attron(COLOR_PAIR(screenAsChar[1][y][x]));
+            mvprintw(y,x, "%c", screenAsChar[0][y][x]);
             attrset(A_NORMAL);
         }
     }
