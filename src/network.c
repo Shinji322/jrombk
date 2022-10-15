@@ -125,7 +125,7 @@ void clientPut(ClientConnection* main, int data) {
 
 
     if ((send(main->socket_fd,main->buffer, /*strlen(main->buffer)*/ 4,0))== -1) {
-            fprintf(stderr, "Failure Sending Message\n");
+           //fprintf(stderr, "Failure Sending Message\n");
     }
 }
 
