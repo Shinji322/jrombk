@@ -4,11 +4,6 @@
 #include <ncurses.h>
 
 
-Player createPlayer(float health, float speed, int x, int y) {
-    return (Player){ PLAYER_SPRITE, health, speed, y, x };
-}
-
-
 void movePlayer(MoveDirection direction, Player* player) {
     int y = player->y;
     int x = player->x;
@@ -62,5 +57,6 @@ void handlePlayerMovement(int cmd, Player* player) {
 
 
 void gameLoop(int input1, int input2) {
-
+    handlePlayerMovement(input1, &player1);
+    handlePlayerMovement(input2, &player2);
 }

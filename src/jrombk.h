@@ -8,14 +8,14 @@
 
 #include "generate.h"
 #include "player.h"
-
+#include "game.h"
+#include "io.h"
 
 
 
 //Functions
 
 // main.c
-
 // game.c
 
 
@@ -23,8 +23,6 @@
 
 
 // io.c
-void initNcurses();
-void printMap();
 
 // network.c
 

@@ -1,6 +1,5 @@
 #include "generate.h"
 #include "jrombk.h"
-#include <curses.h>
 
 
 const int tileTypeToColor[NUMBER_OF_TILE_TYPES] = {
@@ -53,4 +52,17 @@ void printMap() {
         }
     }
     attrset(A_NORMAL);
+}
+
+void printPlayer(Player* player) {
+    attron(COLOR_PAIR(player->color));
+    mvprintw(player->y, player->x, "@"); 
+    attrset(A_NORMAL);
+}
+
+void printScreen() {
+    printMap();
+
+    printPlayer(&player1); 
+    printPlayer(&player2);
 }
