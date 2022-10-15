@@ -18,13 +18,14 @@
 
 #include "jrombk.h"
 
+
 typedef struct ServerConnection {
     struct sockaddr_in server;
     struct sockaddr_in dest;
     int status, socket_fd, client1_fd, client2_fd, num;
     socklen_t size;
 
-    char buffer[1024];
+    char buffer[10241];
     char *buff;
 } ServerConnection;
 
