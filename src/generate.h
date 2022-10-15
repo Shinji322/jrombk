@@ -9,12 +9,6 @@
 
 #define NUMBER_OF_TILE_TYPES 7
 
-typedef struct Tile {
-    int y;
-    int x;
-    int type;
-} Tile;
-
 typedef enum TileType {
     NONE,
     GRASS,
@@ -24,6 +18,12 @@ typedef enum TileType {
     LAVA,
     WALL
 } TileType;
+
+typedef struct Tile {
+    int y;
+    int x;
+    TileType type;
+} Tile;
 
 extern const char* mapTileTypeToChar[NUMBER_OF_TILE_TYPES];
 
