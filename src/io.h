@@ -9,3 +9,5 @@ void mvprintWrapper(bool toScreen, int y, int x, const char* format, ...);
 
 void printScreen(bool toScreen);
 void printScreenCharArray();
+
+char* getScreenArray();
