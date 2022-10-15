@@ -51,7 +51,7 @@ int main()
     }
 
     while(1) {
-    size = sizeof(struct sockaddr_in)
+    size = sizeof(struct sockaddr_in);
     if ((client_fd = accept(socket_fd, (struct sockaddr *)&dest, &size))==-1 ) {
         perror("accept");
         exit(1);
