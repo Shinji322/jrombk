@@ -36,27 +36,29 @@ void initServer(ServerConnection* main){
     
     main->size = sizeof(struct sockaddr_in);
     if ((main->client_fd = accept(main->socket_fd, (struct sockaddr *)&main->dest, &main->size))==-1 ) {
+    //if ((main->client_fd = accept(main->socket_fd, NULL, NULL))==-1 ) {
         perror("accept");
         exit(1);
     }
 
     printf("Server got connection from client %s\n", inet_ntoa(main->dest.sin_addr));
 
-    //fcntl(main->socket_fd, F_SETFL, fcntl(main->socket_fd, F_GETFL, 0) | O_NONBLOCK);    
+    fcntl(main->client_fd, F_SETFL, fcntl(main->client_fd, F_GETFL, 0) | O_NONBLOCK);    
 }
 
 int networkGetch(ServerConnection* main) {
-    if ((main->num = recv(main->client_fd, main->buffer, 1024, /*MSG_DONTWAIT*/ 0)) == -1) {
-        return 0; 
-    }
+    main->num = recv(main->client_fd, main->buffer, 1024, /*MSG_DONTWAIT*/ 0);
+    //if ((main->num = recv(main->client_fd, main->buffer, 1024, /*MSG_DONTWAIT*/ 0)) == -1) {
+    //    return 0; 
+    //}
+    main->buffer[main->num] = '\0';
+    mvprintw(0, 0, "Hi:%s", main->buffer);
     //else if (main->num == 0) {
     //    printf("Connection closed\n");
     //    return 0;
     //}
 
-    main->buffer[main->num] = '\0';
     //printf("Server:Msg Received %s\n", main->buffer);
-    mvprintw(1, 0, "%s", main->buffer);
     //return (int) main->buffer[0]; 
     return ((((int)main->buffer[0]) << 16) | ((int)main->buffer[1] << 8) | ((int) main->buffer[0]));
 
@@ -95,12 +97,16 @@ void initClient(ClientConnection* main, char* address){
 }
 
 void clientPut(ClientConnection* main, int data) {
-    printf("Client: Enter Data for Server:\n");
+    //printf("Client: Enter Data for Server:\n");
+    mvprintw(0, 0, "%c", (char) data);
 
     main->buffer[0] = (char) data >> 16;
     main->buffer[1] = (char) data >> 8;
     main->buffer[2] = (char) data;
     main->buffer[3] = 0;
+
+    main->buffer[0] = (char) data;
+    main->buffer[1] = 0;
     if ((send(main->socket_fd,main->buffer, strlen(main->buffer),0))== -1) {
             fprintf(stderr, "Failure Sending Message\n");
             close(main->socket_fd);
