@@ -1,4 +1,9 @@
+#pragma once
+#include "jrombk.h"
+
+
 #define PLAYER_SPRITE '#'
+
 
 typedef struct Player {
     char sprite;

@@ -35,11 +35,7 @@ void initNcurses(){
 void printMap() {
     for (int y = 0; y < MAP_HEIGHT; y++) {
         for (int x = 0; x < MAP_WIDTH; x++) {
-            if (map[y][x].partOfMap) {
-                mvprintw(y, x, mapTileTypeToChar[map[y][x].type]);
-            } else {
-                mvprintw(y, x, " "); 
-            }
+            mvprintw(y, x, mapTileTypeToChar[map[y][x].type]);
         }
     }
 }
