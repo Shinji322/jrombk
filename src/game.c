@@ -9,10 +9,10 @@ void movePlayer(MoveDirection direction, Player* player) {
     int x = player->x;
     switch (direction) {
         case UP:
-            y++;
+            y--;
             break;
         case DOWN:
-            y--;
+            y++;
             break;
         case RIGHT:
             x++;
@@ -22,15 +22,15 @@ void movePlayer(MoveDirection direction, Player* player) {
             break;
     };
 
-    if (y >= MAP_HEIGHT && y < 0) {
+    if (y >= MAP_HEIGHT || y < 0) {
         return;
     }
-    if (x >= MAP_WIDTH && x < 0) {
+    if (x >= MAP_WIDTH || x < 0) {
         return;
     }
 
     Tile tile = map[y][x];
-    if (tile.type == NONE && tile.type == WALL) {
+    if (tile.type == NONE || tile.type == WALL) {
         return;
     }
 
