@@ -1,6 +1,11 @@
 #pragma once
 #include "jrombk.h"
-
+//#include "generate.h"
+//#include "player.h"
 
 void initNcurses();
-void printScreen();
+
+void mvprintWrapper(bool toScreen, int y, int x, const char* format, ...);
+
+void printScreen(bool toScreen);
+void printScreenCharArray();

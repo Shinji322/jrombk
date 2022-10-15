@@ -13,14 +13,16 @@ int main(int argc, char *argv[]) {
     }
 
     bool isServer = true;
-    ServerConnection server;
-    ClientConnection connection1;
+    ServerConnection server1;
+    ServerConnection server2;
+    ClientConnection connection;
 
     if (strcmp(argv[1], "-S") == 0) {
-        initServer(&server);
+        initServer(&server1);
+        //initServer(&server2);
         isServer = true;
     } else if (strcmp(argv[1], "-C") == 0) {
-        initClient(&connection1, argv[2]);
+        initClient(&connection, argv[2]);
         isServer = false;
     } else {
         return 1;
@@ -46,31 +48,40 @@ int main(int argc, char *argv[]) {
             frameStart = clock();
             command0 = getch();
 
-            command1 = networkGetch(&server);
+            command1 = networkGetch(&server1);
+            //command2 = networkGetch(&server2);
 
             if (command0 == 'r') {
                 generateMap();
             }
 
-            gameLoop(command1, command2);
-            printScreen();
-            mvprintw(1, 0, "%i", command1);
+            gameLoop(command1, command0);
+            printScreen(false);
+            printScreenCharArray();
+            mvprintw(0, 0, "%i", command1);
+            mvprintw(1, 0, "%i", command0);
 
             clock_t frameLen = 0;
             do {
                 frameLen = clock() - frameStart; 
             } while (frameLen < MS_PER_FRAME);
         }
-        closeServer(&server);
+        closeServer(&server1);
+        closeServer(&server2);
     } else {
         while (command1 != 'q') {
-            do {
-                command1 = getch();
-            } while (command1 == ERR);
-           
-            clientPut(&connection1, command1);
+            //do {
+            //    command1 = getch();
+            //} while (command1 == ERR);
+            command1 = getch();
+          
+            if (command1 != ERR) {
+                clientPut(&connection, command1);
+            }
+            
+            printScreenCharArray();
         }
-        closeClient(&connection1);
+        closeClient(&connection);
     }
 
     endwin();

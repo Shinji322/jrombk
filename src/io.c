@@ -1,6 +1,12 @@
 #include "io.h"
-#include "player.h"
+#include <curses.h>
+#include <stdarg.h>
+//#include <libioP.h>
 
+
+char screenAsChar[MAP_HEIGHT][MAP_WIDTH];
+
+char screenAsCharColor[MAP_HEIGHT][MAP_WIDTH] = {COLOR_WHITE};
 
 const int tileTypeToColor[NUMBER_OF_TILE_TYPES] = {
     COLOR_BLACK,
@@ -43,19 +49,42 @@ void initNcurses(){
     nodelay(stdscr, true);
 }
 
+void mvprintWrapper(bool toScreen, int y, int x, const char* format, ...) {
+    if (toScreen) {
+        //mvprintw(y, x, format, );
+        va_list ap;
+        int ret;
 
-void printMap() {
+        if (move(y, x) != OK) return;
+        va_start(ap, format);
+        ret = vw_printw(stdscr, format, ap);
+        va_end(ap);
+    } else {
+        char s[100];
+        va_list arg;
+        int done;
+        va_start (arg, format);
+        done = vsprintf(s, format, arg);
+        va_end (arg);
+
+        screenAsChar[y][x] = s[0];
+    }
+}
+
+
+void printMap(bool toScreen) {
     for (int y = 0; y < MAP_HEIGHT; y++) {
         for (int x = 0; x < MAP_WIDTH; x++) {
-            attron(COLOR_PAIR(tileTypeToColor[map[y][x].type]));
+            //attron(COLOR_PAIR(tileTypeToColor[map[y][x].type]));
+            screenAsCharColor[y][x] = tileTypeToColor[map[y][x].type];
             if (map[y][x].isWall) {
-                mvprintw(y, x, "#");
+                mvprintWrapper(toScreen, y, x, "#");
             } else {
-                mvprintw(y, x, mapTileTypeToChar[map[y][x].type]);
+                mvprintWrapper(toScreen, y, x, mapTileTypeToChar[map[y][x].type]);
             }
         }
     }
-    attrset(A_NORMAL);
+    //attrset(A_NORMAL);
 }
 
 #define NUMBER_OF_BOMB_BLOW_CHARS 9
@@ -71,7 +100,7 @@ const char* bombBlowCycle[NUMBER_OF_BOMB_BLOW_CHARS] = {
     "*"
 };
 
-void printPlayerBombs(Player* player) {
+void printPlayerBombs(Player* player, bool toScreen) {
     for (int i = 0; i < 3; i++) {
         if (player->bombs[i].isPlaced) {
             if (player->bombs[i].isBlowing != 0) {            
@@ -81,30 +110,41 @@ void printPlayerBombs(Player* player) {
                     for (int x = 0; x < MAP_WIDTH; x++) {
                         double currentDistanceFromCenter = sqrt(pow((x - player->bombs[i].x)/2, 2) + pow(y - player->bombs[i].y, 2));
                         if (player->bombs[i].radius >= currentDistanceFromCenter) {
-                            mvprintw(y, x, "%s", charToPrint);
+                            mvprintWrapper(toScreen, y, x, "%s", charToPrint);
                         }
                     }
                 }
             } else {
                 int secondsLeft = floor((player->bombs[i].cyclesToBlow - (frameStart - player->bombs[i].startCycles)) / CLOCKS_PER_SEC); 
-                mvprintw(player->bombs[i].y, player->bombs[i].x, "%i", secondsLeft);
+                mvprintWrapper(toScreen, player->bombs[i].y, player->bombs[i].x, "%i", secondsLeft);
             }
         }
     }
 }
 
-void printPlayer(Player* player) {
-    attron(COLOR_PAIR(player->color));
-    mvprintw(player->y, player->x, "@"); 
-    attrset(A_NORMAL);
+void printPlayer(Player* player, bool toScreen) {
+    //attron(COLOR_PAIR(player->color));
+    screenAsCharColor[player->y][player->x] = player->color;
+    mvprintWrapper(toScreen, player->y, player->x, "@"); 
+    //attrset(A_NORMAL);
 }
 
-void printScreen() {
-    printMap();
+void printScreen(bool toScreen) {
+    printMap(toScreen);
 
-    printPlayer(&player1); 
-    printPlayer(&player2);
+    printPlayer(&player1, toScreen); 
+    printPlayer(&player2, toScreen);
 
-    printPlayerBombs(&player1);
-    printPlayerBombs(&player2);
+    printPlayerBombs(&player1, toScreen);
+    printPlayerBombs(&player2, toScreen);
+}
+
+void printScreenCharArray() {
+    for (int y = 0; y < MAP_HEIGHT; y++) {
+        for (int x = 0; x < MAP_WIDTH; x++) {
+            attron(COLOR_PAIR(screenAsCharColor[y][x]));
+            mvprintw(y,x, "%c", screenAsChar[y][x]);
+            attrset(A_NORMAL);
+        }
+    }
 }
