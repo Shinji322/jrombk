@@ -9,7 +9,7 @@ Player createPlayer(float health, float speed, int x, int y) {
 }
 
 
-void handlePlayerMovement(MoveDirection direction, Player* player) {
+void movePlayer(MoveDirection direction, Player* player) {
     int y = player->y;
     int x = player->x;
     switch (direction) {
@@ -43,7 +43,24 @@ void handlePlayerMovement(MoveDirection direction, Player* player) {
     player->y = y;
 }
 
+void handlePlayerMovement(int cmd, Player* player) {
+    switch (cmd) {
+        case KEY_UP:
+            movePlayer(UP, player);
+            break;
+        case KEY_DOWN:
+            movePlayer(DOWN, player);
+            break;
+        case KEY_LEFT:
+            movePlayer(LEFT, player);
+            break;
+        case KEY_RIGHT:
+            movePlayer(RIGHT, player);
+            break;
+    }
+}
 
-void gameLoop() {
-    
+
+void gameLoop(int input1, int input2) {
+
 }
