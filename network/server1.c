@@ -10,7 +10,7 @@
 #include <arpa/inet.h>
 
 #define PORT 3490
-#define BACKLOG 10
+#define BACKLOG 2
 
 int main()
 {
