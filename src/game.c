@@ -43,7 +43,7 @@ void movePlayer(MoveDirection direction, Player* player) {
     tile.hasPlayer = 1;
 }
 
-void handlePlayerMovement(int cmd, Player* player) {
+void handlePlayerInput(int cmd, Player* player) {
     switch (cmd) {
         case KEY_UP:
             movePlayer(UP, player);
@@ -62,6 +62,6 @@ void handlePlayerMovement(int cmd, Player* player) {
 
 
 void gameLoop(int input1, int input2) {
-    handlePlayerMovement(input1, &player1);
-    handlePlayerMovement(input2, &player2);
+    handlePlayerInput(input1, &player1);
+    handlePlayerInput(input2, &player2);
 }
