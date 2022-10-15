@@ -47,12 +47,12 @@ void initServer(ServerConnection* main){
 }
 
 int networkGetch(ServerConnection* main) {
-    main->num = recv(main->client_fd, main->buffer, 1024, /*MSG_DONTWAIT*/ 0);
-    //if ((main->num = recv(main->client_fd, main->buffer, 1024, /*MSG_DONTWAIT*/ 0)) == -1) {
-    //    return 0; 
-    //}
-    main->buffer[main->num] = '\0';
-    mvprintw(0, 0, "Hi:%s", main->buffer);
+    //main->num = recv(main->client_fd, main->buffer, 4, /*MSG_DONTWAIT*/ 0);
+    //mvprintw(0, 0, "Hi:%s", main->buffer);
+    if ((main->num = recv(main->client_fd, main->buffer, 4, /*MSG_DONTWAIT*/ 0)) == -1) {
+        return 0; 
+    }
+    //main->buffer[main->num] = '\0';
     //else if (main->num == 0) {
     //    printf("Connection closed\n");
     //    return 0;
@@ -60,7 +60,7 @@ int networkGetch(ServerConnection* main) {
 
     //printf("Server:Msg Received %s\n", main->buffer);
     //return (int) main->buffer[0]; 
-    return ((((int)main->buffer[0]) << 16) | ((int)main->buffer[1] << 8) | ((int) main->buffer[0]));
+    return ((((int)main->buffer[2]) << 16) | (((int)main->buffer[1]) << 8) | ((int) main->buffer[0]));
 
     //if ((send(main->client_fd,main->buffer, strlen(main->buffer),0))== -1){
     //    fprintf(stderr, "Failure Sending Message\n");
@@ -98,16 +98,16 @@ void initClient(ClientConnection* main, char* address){
 
 void clientPut(ClientConnection* main, int data) {
     //printf("Client: Enter Data for Server:\n");
-    mvprintw(0, 0, "%c", (char) data);
-
-    main->buffer[0] = (char) data >> 16;
-    main->buffer[1] = (char) data >> 8;
-    main->buffer[2] = (char) data;
+    main->buffer[0] = (char) data;
+    main->buffer[1] = (char) (data >> 8);
+    main->buffer[2] = (char) (data >> 16);
     main->buffer[3] = 0;
 
-    main->buffer[0] = (char) data;
-    main->buffer[1] = 0;
-    if ((send(main->socket_fd,main->buffer, strlen(main->buffer),0))== -1) {
+    mvprintw(0,0,"%i", data); 
+    mvprintw(1,0,"%i", (((((int)main->buffer[2])) << 16) | (((int)main->buffer[1]) << 8) | ((int) main->buffer[0])));
+
+
+    if ((send(main->socket_fd,main->buffer, /*strlen(main->buffer)*/ 4,0))== -1) {
             fprintf(stderr, "Failure Sending Message\n");
             close(main->socket_fd);
             exit(1);

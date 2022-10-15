@@ -53,7 +53,8 @@ int main(int argc, char *argv[]) {
             }
 
             gameLoop(command1, command2);
-            //printScreen();
+            printScreen();
+            mvprintw(1, 0, "%i", command1);
 
             clock_t frameLen = 0;
             do {
