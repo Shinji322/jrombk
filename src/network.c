@@ -88,7 +88,7 @@ int sendServerData(ServerConnection* main, bool isPlayerOne){
         }
     }
 
-    return ("Server:Msg being sent: %s\nNumber of bytes sent: %d\n",main->buffer, strlen(main->buffer)));
+    return ("Server:Msg being sent: %s\nNumber of bytes sent: %d\n",main->buffer, strlen(main->buffer))); // change this to what you wnat
 
 
 }
@@ -136,20 +136,15 @@ void clientPut(ClientConnection* main, int data) {
             close(main->socket_fd);
             exit(1);
     }
-    //else {
-    //        printf("Client:Message being sent: %s\n",buffer);
-    //        num = recv(socket_fd, buffer, sizeof(buffer),0);
-    //        if ( num <= 0 )
-    //        {
-    //                printf("Either Connection Closed or Error\n");
-    //                //Break from the While
-    //                break;
-    //        }
+}
 
-    //        buff[num] = '\0';
-    //        printf("Client:Message Received From Server -  %s\n",buffer);
-    //   }
+void receiveServerData(ClientConnection* main){
+    int temp;
+    if(temp = recv(socket_fd, main->bufferIn, sizeof(main->bufferIn),0) <= 0){
+        printf("Either Connection Closed or Error\n");
+        break;
 
+    }
 }
 
 void closeClient(ClientConnection* main) {
