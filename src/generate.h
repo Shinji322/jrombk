@@ -22,6 +22,7 @@ typedef enum TileType {
 typedef struct Tile {
     int y;
     int x;
+    int hasPlayer;
     TileType type;
 } Tile;
 

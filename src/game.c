@@ -33,9 +33,14 @@ void movePlayer(MoveDirection direction, Player* player) {
     if (tile.type == NONE || tile.type == WALL) {
         return;
     }
+    if (tile.hasPlayer) {
+        return;
+    }
 
+    map[player->y][player->x].hasPlayer = 0;
     player->x = x;
     player->y = y;
+    tile.hasPlayer = 1;
 }
 
 void handlePlayerMovement(int cmd, Player* player) {

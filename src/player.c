@@ -10,5 +10,6 @@ Player createPlayer(Player *player, float health, float speed, int color, int x,
     player->color = color;
     player->x = x;
     player->y = y;
+    map[y][x].hasPlayer = 1;
     //return (Player){ PLAYER_SPRITE, health, speed, color, y, x };
 }
