@@ -1,5 +1,4 @@
 #pragma once
-#include "generate.h"
 #include "jrombk.h"
 
 #define PLAYER_SPRITE '@'

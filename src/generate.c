@@ -1,6 +1,4 @@
 #include "generate.h"
-#include "jrombk.h"
-#include <stdlib.h>
 
 const char* mapTileTypeToChar[NUMBER_OF_TILE_TYPES] = {
     " ",
@@ -34,6 +32,8 @@ void generateMap() {
             map[y][x].y = y;
             map[y][x].x = x;
            
+            map[y][x].bomb = &noneBomb;
+
             double currentDistanceFromCenter = sqrt(pow((x - MAP_WIDTH / 2)/2, 2) + pow(y - MAP_HEIGHT/2, 2));
             if (ceil(currentDistanceFromCenter) == MAP_RADIUS) {
                 map[y][x].type = WALL;

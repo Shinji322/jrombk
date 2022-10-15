@@ -6,6 +6,9 @@
 #include <stdlib.h>
 #include <time.h>
 
+extern clock_t frameStart;
+
+#include "bombs.h"
 #include "generate.h"
 #include "player.h"
 #include "game.h"

@@ -1,5 +1,5 @@
-#include "generate.h"
-#include "jrombk.h"
+#include "io.h"
+#include "player.h"
 
 
 const int tileTypeToColor[NUMBER_OF_TILE_TYPES] = {
@@ -54,6 +54,41 @@ void printMap() {
     attrset(A_NORMAL);
 }
 
+#define NUMBER_OF_BOMB_BLOW_CHARS 9
+const char* bombBlowCycle[NUMBER_OF_BOMB_BLOW_CHARS] = {
+    "%",
+    "%",
+    "\\",
+    "-",
+    "/",
+    "|",
+    "*",
+    "*",
+    "*"
+};
+
+void printPlayerBombs(Player* player) {
+    for (int i = 0; i < 3; i++) {
+        if (player->bombs[i].isPlaced) {
+            if (player->bombs[i].isBlowing != 0) {            
+                const char* charToPrint = bombBlowCycle[(int) floor(player->bombs[i].isBlowing / ((60) / (NUMBER_OF_BOMB_BLOW_CHARS - 1)))];
+
+                for (int y = 0; y < MAP_HEIGHT; y++) {
+                    for (int x = 0; x < MAP_WIDTH; x++) {
+                        double currentDistanceFromCenter = sqrt(pow((x - player->bombs[i].x)/2, 2) + pow(y - player->bombs[i].y, 2));
+                        if (player->bombs[i].radius >= currentDistanceFromCenter) {
+                            mvprintw(y, x, "%s", charToPrint);
+                        }
+                    }
+                }
+            } else {
+                int secondsLeft = floor((player->bombs[i].cyclesToBlow - (frameStart - player->bombs[i].startCycles)) / CLOCKS_PER_SEC); 
+                mvprintw(player->bombs[i].y, player->bombs[i].x, "%i", secondsLeft);
+            }
+        }
+    }
+}
+
 void printPlayer(Player* player) {
     attron(COLOR_PAIR(player->color));
     mvprintw(player->y, player->x, "@"); 
@@ -65,4 +100,7 @@ void printScreen() {
 
     printPlayer(&player1); 
     printPlayer(&player2);
+
+    printPlayerBombs(&player1);
+    printPlayerBombs(&player2);
 }

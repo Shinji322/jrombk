@@ -6,7 +6,10 @@ typedef struct Bomb {
     clock_t cyclesToBlow;
     int isNone;
     int isPlaced;
+    int isBlowing;
+    int radius;
     int y;
     int x;
 } Bomb;
 
+extern Bomb noneBomb;

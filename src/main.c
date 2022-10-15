@@ -1,5 +1,4 @@
 #include "jrombk.h"
-#include <time.h>
 
 #define MS_PER_FRAME (CLOCKS_PER_SEC / 60)
 

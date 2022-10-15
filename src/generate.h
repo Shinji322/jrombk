@@ -1,5 +1,4 @@
 #pragma once
-#include "bombs.h"
 #include "jrombk.h"
 
 #define MAP_HEIGHT 40

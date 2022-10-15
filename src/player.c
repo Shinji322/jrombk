@@ -11,5 +11,9 @@ void createPlayer(Player *player, float health, int color, int x, int y) {
     player->x = x;
     player->y = y;
     map[y][x].hasPlayer = 1;
+
+    player->bombs[0] = (Bomb) {0,0,0,0,0,0,0,0};
+    player->bombs[1] = (Bomb) {0,0,0,0,0,0,0,0};
+    player->bombs[2] = (Bomb) {0,0,0,0,0,0,0,0};
     //return (Player){ PLAYER_SPRITE, health, speed, color, y, x };
 }
