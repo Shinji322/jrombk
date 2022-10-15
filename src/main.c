@@ -50,7 +50,9 @@ int main(int argc, char *argv[]) {
             frameStart = clock();
             command0 = getch();
 
-            command1 = networkGetch(&server);
+            command1 = networkGetch(&server, true);
+            command2 = networkGetch(&server, false);
+
 
             if (command0 == 'r') {
                 generateMap();
@@ -59,6 +61,7 @@ int main(int argc, char *argv[]) {
             gameLoop(command1, command2);
             printScreen();
             mvprintw(1, 0, "%i", command1);
+            mvprintw(1, 0, "%i", command2);
 
             clock_t frameLen = 0;
             do {
