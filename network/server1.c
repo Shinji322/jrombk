@@ -56,7 +56,7 @@ int main()
         perror("accept");
         exit(1);
     }
-    printf("Server got connection from client %s\n", inet_ntoa(dest.sin_addr))
+    printf("Server got connection from client %s\n", inet_ntoa(dest.sin_addr));
     while(1){ 
       if ((num = recv(client_fd, buffer, 1024,0))== -1) {
           perror("recv");
