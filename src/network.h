@@ -21,7 +21,7 @@
 typedef struct ServerConnection {
     struct sockaddr_in server;
     struct sockaddr_in dest;
-    int status,socket_fd, client_fd,num;
+    int status, socket_fd, client1_fd, client2_fd, num;
     socklen_t size;
 
     char buffer[1024];
