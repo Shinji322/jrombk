@@ -1,6 +1,6 @@
 #include "network.h"
 #include "io.h"
-#include <curses.h>
+#include "compress.h"
 
 void initServer(ServerConnection* main){
     int yes =1;
@@ -72,14 +72,26 @@ int networkGetch(ServerConnection* main, bool isPlayerOne) {
 
 void sendServerData(ServerConnection* main, bool isPlayerOne){
     char* buff = getScreenArray();
+    char* compBuff = compress(buff, MAP_HEIGHT * MAP_WIDTH);
+    size_t size = strlen(compBuff);
     if(isPlayerOne){
-        if ((send(main->client1_fd, buff, MAP_HEIGHT * MAP_WIDTH * 2,0))== -1){
+        //if ((send(main->client1_fd, buff, MAP_HEIGHT * MAP_WIDTH /** 2*/,0))== -1){
+        if ((send(main->client1_fd, (const void*) &size, sizeof(size_t),0))== -1){
+            fprintf(stderr, "Failure Sending Message\n");
+            close(main->client1_fd);
+        }
+        if ((send(main->client1_fd, compBuff, strlen(compBuff),0))== -1){
             fprintf(stderr, "Failure Sending Message\n");
             close(main->client1_fd);
         }
     }
     else{
-        if ((send(main->client2_fd, buff, MAP_HEIGHT * MAP_WIDTH * 2,0))== -1){
+        //if ((send(main->client2_fd, buff, MAP_HEIGHT * MAP_WIDTH /** 2*/,0))== -1){
+        if ((send(main->client2_fd, (const void*) &size, sizeof(size_t),0))== -1){
+            fprintf(stderr, "Failure Sending Message\n");
+            close(main->client2_fd);
+        }
+        if ((send(main->client2_fd, compBuff, strlen(compBuff),0))== -1){
             fprintf(stderr, "Failure Sending Message\n");
             close(main->client2_fd);
         }
@@ -129,11 +141,24 @@ void clientPut(ClientConnection* main, int data) {
     }
 }
 
-void receiveServerData(ClientConnection* main){
+int receiveServerData(ClientConnection* main){
     char* buff = getScreenArray();
-    if(recv(main->socket_fd, buff, MAP_HEIGHT * MAP_WIDTH * 2,0) <= 0){
-        printf("Either Connection Closed or Error\n");
+    int size;
+    if(recv(main->socket_fd, &size, sizeof(size_t),0) <= 0){
+        //printf("Either Connection Closed or Error\n");
+        return -1;
     }
+
+    char* compBuff = malloc(size * sizeof(char));
+    int ret = -1;
+    do {
+        ret = recv(main->socket_fd, compBuff, size,0);
+    } while (ret == -1);
+
+    decompress(compBuff, size, buff, MAP_HEIGHT * MAP_WIDTH);
+
+        
+    return 1;
 }
 
 void closeClient(ClientConnection* main) {

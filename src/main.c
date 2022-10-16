@@ -85,9 +85,9 @@ int main(int argc, char *argv[]) {
                 clientPut(&connection, command1);
             }
            
-            receiveServerData(&connection);
-            
-            printScreenCharArray();
+            if (receiveServerData(&connection) != -1) {
+                printScreenCharArray();
+            }
         }
         closeClient(&connection);
     }

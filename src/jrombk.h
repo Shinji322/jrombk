@@ -14,6 +14,7 @@ extern clock_t frameStart;
 #include "player.h"
 #include "game.h"
 #include "io.h"
+#include "compress.h"
 
 
 

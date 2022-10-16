@@ -49,6 +49,6 @@ void initClient(ClientConnection* main, char* address);
 
 void clientPut(ClientConnection* main, int data);
 
-void receiveServerData(ClientConnection* main);
+int receiveServerData(ClientConnection* main);
 
 void closeClient(ClientConnection* main);
