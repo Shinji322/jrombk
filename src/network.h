@@ -14,7 +14,7 @@
 
 #define PORT 3490
 #define MAXSIZE 1024
-#define BACKLOG 2
+#define BACKLOG 4
 
 #include "jrombk.h"
 
