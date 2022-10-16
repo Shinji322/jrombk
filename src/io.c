@@ -5,7 +5,7 @@
 
 
 
-char screenAsChar[2][MAP_HEIGHT][MAP_WIDTH] = {COLOR_WHITE};
+char screenAsChar[MAP_HEIGHT][MAP_WIDTH][2] = {COLOR_WHITE};
 
 const int tileTypeToColor[NUMBER_OF_TILE_TYPES] = {
     COLOR_BLACK,
@@ -66,7 +66,7 @@ void mvprintWrapper(bool toScreen, int y, int x, const char* format, ...) {
         done = vsprintf(s, format, arg);
         va_end (arg);
 
-        screenAsChar[0][y][x] = s[0];
+        screenAsChar[y][x][0] = s[0];
     }
 }
 
@@ -75,7 +75,7 @@ void printMap(bool toScreen) {
     for (int y = 0; y < MAP_HEIGHT; y++) {
         for (int x = 0; x < MAP_WIDTH; x++) {
             //attron(COLOR_PAIR(tileTypeToColor[map[y][x].type]));
-            screenAsChar[1][y][x] = tileTypeToColor[map[y][x].type];
+            screenAsChar[y][x][1] = tileTypeToColor[map[y][x].type];
             if (map[y][x].isWall) {
                 mvprintWrapper(toScreen, y, x, "#");
             } else {
@@ -123,7 +123,7 @@ void printPlayerBombs(Player* player, bool toScreen) {
 
 void printPlayer(Player* player, bool toScreen) {
     //attron(COLOR_PAIR(player->color));
-    screenAsChar[1][player->y][player->x] = player->color;
+    screenAsChar[player->y][player->x][1] = player->color;
     mvprintWrapper(toScreen, player->y, player->x, "%c", player->sprite); 
     //attrset(A_NORMAL);
 }
@@ -141,8 +141,8 @@ void printScreen(bool toScreen) {
 void printScreenCharArray() {
     for (int y = 0; y < MAP_HEIGHT; y++) {
         for (int x = 0; x < MAP_WIDTH; x++) {
-            attron(COLOR_PAIR(screenAsChar[1][y][x]));
-            mvprintw(y,x, "%c", screenAsChar[0][y][x]);
+            attron(COLOR_PAIR(screenAsChar[y][x][1]));
+            mvprintw(y,x, "%c", screenAsChar[y][x][0]);
             attrset(A_NORMAL);
         }
     }
