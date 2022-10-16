@@ -123,6 +123,8 @@ void initClient(ClientConnection* main, char* address){
         perror("connect");
         exit(1);
     }
+
+    fcntl(main->socket_fd, F_SETFL, fcntl(main->socket_fd, F_GETFL, 0) | O_NONBLOCK);
 }
 
 void clientPut(ClientConnection* main, int data) {
