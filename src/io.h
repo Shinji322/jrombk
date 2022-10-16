@@ -11,3 +11,5 @@ void printScreen(bool toScreen);
 void printScreenCharArray();
 
 char* getScreenArray();
+
+void printTitle();

@@ -154,7 +154,9 @@ char* getScreenArray() {
 
 
 void printTitle() {
-    char arr[][72] = {
+#define TITLE_HEIGHT 6
+#define TITLE_WIDTH 72
+    const char arr[TITLE_HEIGHT][TITLE_WIDTH] = {
         "     ....:::::::::::::..       ...     .        :   :::::::.   :::  .   ",
         "  ;;;;;;;;;````;;;;``;;;;   .;;;;;;;.  ;;,.    ;;;   ;;;'';;'  ;;; .;;,.",
         "  ''`  `[[.     [[[,/[[['  ,[[     \\[[,[[[[, ,[[[[,  [[[__[[\\. [[[[[/'  ",
@@ -162,10 +164,17 @@ void printTitle() {
         " 888boood88     888b '88bo,'888,_ _,88P888 Y88' 888o_88o,,od8P'888'88o, ",
         " 'MMMMMMMM'     MMMM   'W'   'YMMMMMP' MMM  M'  'MMM''YUMMMP'  MMM 'MMP'",
     };
-    for (int y = 0; y < MAP_HEIGHT; y++) {
-        for (int x = 0; x < MAP_WIDTH; x++) {
-            mvprintWrapper(0, y, x, "%c", arr[y][x]);
+    int startX = (MAP_WIDTH - TITLE_WIDTH) / 2;
+    int endX = (MAP_WIDTH + TITLE_WIDTH) / 2;
+    int startY = (MAP_HEIGHT - TITLE_HEIGHT) / 2;
+    int endY = (MAP_HEIGHT + TITLE_HEIGHT) / 2;
+    for (int y = startY; y < endY; y++) {
+        for (int x = startX; x < endX; x++) {
+            mvprintw(y, x, "%c", arr[y][x]);
         }
+    }
+    for (int y = startY; y < endY; y++) {
+        mvprintw(y, startX, "%s", arr[y]);
     }
 }
 
