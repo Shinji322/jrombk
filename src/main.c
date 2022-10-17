@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
     createPlayer(&player1, 100, COLOR_RED, MAP_WIDTH/2 - MAP_RADIUS, MAP_HEIGHT / 2);
     createPlayer(&player2, 100, COLOR_BLUE, MAP_WIDTH/2 + MAP_RADIUS, MAP_HEIGHT / 2);
 
-    initNcurses();
+    //initNcurses();
 
     srand(time(NULL));
 
@@ -47,34 +47,43 @@ int main(int argc, char *argv[]) {
     int command1 = 0;
     int command2 = 0;
     if (isServer) {
-        while (command0 != 'q') {
+        while (1){//command0 != 'q') {
             frameStart = clock();
-            command0 = getch();
+            //command0 = getch();
 
             command1 = networkGetch(&server, true);
             command2 = networkGetch(&server, false);
 
-            if (command0 == 'r') {
-                generateMap();
-            }
+            //if (command0 == 'r') {
+            //    generateMap();
+            //}
 
             gameLoop(command1, command2);
             printScreen(false);
-            printScreenCharArray();
+            //printScreenCharArray();
 
             sendServerData(&server, true);
             sendServerData(&server, false);
-
-            mvprintw(0, 0, "%i", command1);
-            mvprintw(1, 0, "%i", command0);
+            
+            if(command1 != 0 || command2 != 0){ //prints after 94 presses???
+                //mvprintw(0, 0, "%i", command1);
+                //mvprintw(1, 0, "%i", command2);
+                printf("hello there");
+                //printf("P1: %s | P2: %d\n", command1, command2);
+            }
+            //printf("P1: %s | P2: %d\n", command1, command2);
+            
 
             clock_t frameLen = 0;
             do {
                 frameLen = clock() - frameStart; 
-            } while (frameLen < MS_PER_FRAME);
+            } 
+            while (frameLen < MS_PER_FRAME);
         }
         closeServer(&server);
-    } else {
+    } 
+    else {
+        initNcurses();
         while (command1 != 'q') {
             //do {
             //    command1 = getch();

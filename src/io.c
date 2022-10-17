@@ -18,7 +18,6 @@ const int tileTypeToColor[NUMBER_OF_TILE_TYPES] = {
 };
 
 void initColor(){
-    // Alow the use of color
     use_default_colors();
     start_color();
     init_pair(COLOR_BLACK, COLOR_BLACK, COLOR_BLACK);
@@ -31,7 +30,6 @@ void initColor(){
     init_pair(COLOR_YELLOW, COLOR_YELLOW, COLOR_BLACK);
 }
 
-// Set up terminal with ncurses library
 void initNcurses(){
     // Init curses
     initscr(); 
@@ -58,7 +56,8 @@ void mvprintWrapper(bool toScreen, int y, int x, const char* format, ...) {
         va_start(ap, format);
         ret = vw_printw(stdscr, format, ap);
         va_end(ap);
-    } else {
+    } 
+    else {
         char s[100];
         va_list arg;
         int done;
