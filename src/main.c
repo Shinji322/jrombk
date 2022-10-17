@@ -12,26 +12,26 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    bool isServer = true;
+    bool isServer;
     ServerConnection server;
     ClientConnection connection;
 
     if (strcmp(argv[1], "-S") == 0) {
         initServer(&server);
-        //initServer(&server2);
         isServer = true;
-    } else if (strcmp(argv[1], "-C") == 0) {
+    } 
+    else if (strcmp(argv[1], "-C") == 0) {
         if (argc != 3) {
             printf("Invalid Arguments\n");
             return 1;
         }
         initClient(&connection, argv[2]);
         isServer = false;
-    } else {
+    } 
+    else {
         return 1;
     }
 
-    // Init network and wait for connect
 
     createPlayer(&player1, 100, COLOR_RED, MAP_WIDTH/2 - MAP_RADIUS, MAP_HEIGHT / 2);
     createPlayer(&player2, 100, COLOR_BLUE, MAP_WIDTH/2 + MAP_RADIUS, MAP_HEIGHT / 2);
