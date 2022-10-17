@@ -58,31 +58,22 @@ void initServer(ServerConnection* main){
 }
 
 int networkGetch(ServerConnection* main, bool isPlayerOne) {
-    if(isPlayerOne){
-        if ((main->num = recv(main->client1_fd, main->buffer, 4, /*MSG_DONTWAIT*/ 0)) == -1) {
-            return 0; 
-        }
-    } else {
-        if ((main->num = recv(main->client2_fd, main->buffer, 4, /*MSG_DONTWAIT*/ 0)) == -1) {
-            return 0; 
-        }
+    int client = isPlayerOne ? main->client1_fd : main->client2_fd;
+
+    if ((main->num = recv(client, main->buffer, 4, /*MSG_DONTWAIT*/ 0)) == -1) {
+        return 0; 
     }
+
     return ((((int)main->buffer[2]) << 16) | (((int)main->buffer[1]) << 8) | ((int) main->buffer[0]));
 }
 
 void sendServerData(ServerConnection* main, bool isPlayerOne){
+    int client = isPlayerOne ? main->client1_fd : main->client2_fd;
     char* buff = getScreenArray();
-    if(isPlayerOne){
-        if ((send(main->client1_fd, buff, MAP_HEIGHT * MAP_WIDTH * 2,0))== -1){
-            fprintf(stderr, "Failure Sending Message\n");
-            close(main->client1_fd);
-        }
-    }
-    else{
-        if ((send(main->client2_fd, buff, MAP_HEIGHT * MAP_WIDTH * 2,0))== -1){
-            fprintf(stderr, "Failure Sending Message\n");
-            close(main->client2_fd);
-        }
+
+    if ((send(client, buff, MAP_HEIGHT * MAP_WIDTH * 2,0))== -1){
+        fprintf(stderr, "Failure Sending Message\n");
+        close(client);
     }
 }
 
@@ -132,7 +123,7 @@ void clientPut(ClientConnection* main, int data) {
 void receiveServerData(ClientConnection* main){
     char* buff = getScreenArray();
     if(recv(main->socket_fd, buff, MAP_HEIGHT * MAP_WIDTH * 2,0) <= 0){
-        printf("Either Connection Closed or Error\n");
+        printf("Either Connection Closed or Error Occurred\n");
     }
 }
 

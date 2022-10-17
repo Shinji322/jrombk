@@ -68,10 +68,9 @@ int main(int argc, char *argv[]) {
             if(command1 != 0 || command2 != 0){ //prints after 94 presses???
                 //mvprintw(0, 0, "%i", command1);
                 //mvprintw(1, 0, "%i", command2);
-                printf("hello there");
-                //printf("P1: %s | P2: %d\n", command1, command2);
+                printf("P1: %d | P2: %d\n", command1, command2);
             }
-            //printf("P1: %s | P2: %d\n", command1, command2);
+            
             
 
             clock_t frameLen = 0;
@@ -84,14 +83,14 @@ int main(int argc, char *argv[]) {
     } 
     else {
         initNcurses();
-        while (command1 != 'q') {
+        while (command0 != 'q') {
             //do {
             //    command1 = getch();
             //} while (command1 == ERR);
-            command1 = getch();
+            command0 = getch();
           
-            if (command1 != ERR) {
-                clientPut(&connection, command1);
+            if (command0 != ERR) {
+                clientPut(&connection, command0);
             }
            
             receiveServerData(&connection);
