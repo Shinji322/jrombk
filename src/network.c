@@ -72,8 +72,9 @@ int networkGetch(ServerConnection* main, bool isPlayerOne) {
 
 void sendServerData(ServerConnection* main, bool isPlayerOne){
     char* buff = getScreenArray();
-    char* compBuff = compress(buff, MAP_HEIGHT * MAP_WIDTH);
-    size_t size = strlen(compBuff);
+    int size = 0;
+    char* compBuff = compress(buff, MAP_HEIGHT * MAP_WIDTH * 2, &size);
+    //size_t size = strlen(compBuff);
     if(isPlayerOne){
         //if ((send(main->client1_fd, buff, MAP_HEIGHT * MAP_WIDTH /** 2*/,0))== -1){
         if ((send(main->client1_fd, (const void*) &size, sizeof(size_t),0))== -1){
@@ -157,7 +158,7 @@ int receiveServerData(ClientConnection* main){
         ret = recv(main->socket_fd, compBuff, size,0);
     } while (ret == -1);
 
-    decompress(compBuff, size, buff, MAP_HEIGHT * MAP_WIDTH);
+    decompress(compBuff, size, buff, MAP_HEIGHT * MAP_WIDTH * 2);
 
         
     return 1;

@@ -76,6 +76,7 @@ int main(int argc, char *argv[]) {
         closeServer(&server);
     } else {
         while (command1 != 'q') {
+            frameStart = clock();
             //do {
             //    command1 = getch();
             //} while (command1 == ERR);
@@ -88,6 +89,10 @@ int main(int argc, char *argv[]) {
             if (receiveServerData(&connection) != -1) {
                 printScreenCharArray();
             }
+            clock_t frameLen = 0;
+            do {
+                frameLen = clock() - frameStart; 
+            } while (frameLen < MS_PER_FRAME);
         }
         closeClient(&connection);
     }

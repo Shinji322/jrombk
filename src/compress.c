@@ -1,6 +1,6 @@
 #include "compress.h"
 
-char* compress(char* string, int length) {
+char* compress(char* string, int length, int* newLen) {
     int newStringIndex = 0;
     char* newString = malloc(length * sizeof(char));
 
@@ -15,7 +15,7 @@ char* compress(char* string, int length) {
             newString[newStringIndex++] = intString[0];
             newString[newStringIndex++] = intString[1];
             newString[newStringIndex++] = intString[2];
-            newString[newStringIndex++] = oldChar;
+            newString[newStringIndex++] = oldChar + 1;
 
             if (i != length) {
                 oldChar = string[i];
@@ -24,7 +24,8 @@ char* compress(char* string, int length) {
         }
     }
 
-    newString[newStringIndex] = 0; 
+    newString[newStringIndex] = 0;
+    *newLen = newStringIndex;
 
     return newString;
 }
@@ -35,7 +36,7 @@ void decompress(char* string, int inLen, char* outString, int outLen) {
     
 
     for (int i = 0; i < (inLen/4); i++) {
-        char repChar = string[i*4 + 3];
+        char repChar = string[i*4 + 3] - 1;
         string[i*4 + 3] = 0;
         int rep = atoi(&string[i*4]);
         for (int j = 0; j < rep; j++) {
