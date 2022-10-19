@@ -7,4 +7,4 @@ SOURCE_FILES=$(wildcard *.c)
 OUTPUT_FILE=jrombk
 
 main:
-	$(CC) $(SOURCE_FILES) -o $(OUTPUT_FILE) $(LIBS)
+	$(CC) -g $(SOURCE_FILES) -o $(OUTPUT_FILE) $(LIBS)

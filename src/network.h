@@ -1,54 +1,47 @@
 #pragma once
-
+#include "jrombk.h"
+#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <errno.h>
 #include <string.h>
-#include <netdb.h>
-#include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
+#include <unistd.h>
 #include <arpa/inet.h>
+#include <netdb.h>
 #include <fcntl.h>
 
-#define PORT 3490
-#define MAXSIZE 1024
-#define BACKLOG 2
-
-#include "jrombk.h"
-
+#define PORT 8080
 
 typedef struct ServerConnection {
-    struct sockaddr_in server;
-    struct sockaddr_in dest;
-    int status, socket_fd, client1_fd, client2_fd, num;
-    socklen_t size;
-
-    char buffer[10241];
-    char *buff;
+   int socketFd;
+   int clientSocket1;
+   int clientSocket2;
+   struct sockaddr_in address;
+   socklen_t addressSize;
+   int valRead;
+   int bufferIn;
 } ServerConnection;
 
 typedef struct ClientConnection {
-    struct sockaddr_in server_info;
-    struct hostent *he;
-    int socket_fd,num;
-    char buffer[1024];
-    //char bufferIn[MAP_HEIGHT * MAP_WIDTH * 2];
+    int socketFd;
+    int clientFd;
+    struct sockaddr_in address;
+    socklen_t addressSize;
 } ClientConnection;
 
-void initServer(ServerConnection* main);
+void initServer(ServerConnection* server, int port);
 
-int networkGetch(ServerConnection* main, bool isPlayerOne);
+int getClientData(int socketFd);
 
-void sendServerData(ServerConnection* main, bool isPlayerOne);
+void sendClientData(int socketFd, char buffer[], int size);
 
-void closeServer(ServerConnection* main);
+void closeServer(ServerConnection* server);
 
-void initClient(ClientConnection* main, char* address);
+void initClient(ClientConnection* client, char* address, int port);
 
-void clientPut(ClientConnection* main, int data);
+void getServerData(ClientConnection* client, char buffer[], int size);
 
-void receiveServerData(ClientConnection* main);
+void sendServerData(ClientConnection* client, int val);
 
-void closeClient(ClientConnection* main);
+void closeClient(ClientConnection* client);
+

@@ -9,6 +9,7 @@
 
 extern clock_t frameStart;
 
+#include "misc.h"
 #include "bombs.h"
 #include "generate.h"
 #include "player.h"

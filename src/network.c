@@ -1,141 +1,146 @@
 #include "network.h"
-#include "io.h"
-#include <curses.h>
+#include <netdb.h>
+#include <sys/socket.h>
 
-void initServer(ServerConnection* main){
-    int yes =1;
 
-    if ((main->socket_fd = socket(AF_INET, SOCK_STREAM, 0))== -1) { //makes master socket
-        fprintf(stderr, "Socket failure!!\n");
-        exit(1);
+void initServer(ServerConnection* server, int port) {
+    int opt = 1;
+
+    server->socketFd = socket(AF_INET, SOCK_STREAM, 0);
+    if (server->socketFd < 0) {
+        internalLog("Failed to init socket.");
+        exit(0);
     }
 
-    if (setsockopt(main->socket_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) { //tells socket to allow multiple connections
-        perror("setsockopt");
-        exit(1);
+    int ret = setsockopt(server->socketFd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt));
+
+    if (ret) {
+        internalLog("Failed to set socket opt");
+        exit(0);
     }
 
-    memset(&main->server, 0, sizeof(&main->server));
-    memset(&main->dest,0,sizeof(main->dest));
+    server->address.sin_family = AF_INET;
+    server->address.sin_addr.s_addr = INADDR_ANY;
+    server->address.sin_port = htons(port);
 
+    server->addressSize = sizeof(server->address);
 
+    ret = bind(server->socketFd, (struct sockaddr*)&server->address, server->addressSize);
 
-    main->server.sin_family = AF_INET; // sets ipv4 access
-    main->server.sin_port = htons(PORT); //set port number
-    main->server.sin_addr.s_addr = INADDR_ANY; //no ip blacklist 
-
-    if ((bind(main->socket_fd, (struct sockaddr *)&main->server, sizeof(struct sockaddr )))== -1)    { //binds master socket 
-        fprintf(stderr, "Binding Failure\n");
-        exit(1);
+    if (ret < 0) {
+        internalLog("Bind error");
+        exit(0);
     }
 
-    if ((listen(main->socket_fd, BACKLOG))< 0){ //tells socket to listen to port, BACKLOG is # of concurrent connection
-        fprintf(stderr, "Listening Failure\n");
-        exit(1);
+    ret = listen(server->socketFd, 3);
+
+    if (ret < 0) {
+        internalLog("Listen error");
+        exit(0);
+    }
+
+
+    printf("Waiting for Player 1 to connect\n");
+    server->clientSocket1 = accept(server->socketFd, (struct sockaddr*)&server->address, &server->addressSize);
+
+    if (server->clientSocket1 < 0) {
+        internalLog("Player 1 accept error");
+        exit(0);
     }
 
     
-    main->size = sizeof(struct sockaddr_in); //sets size to construc size
-    if ((main->client1_fd = accept(main->socket_fd, (struct sockaddr *)&main->dest, &main->size))==-1 ) {
-        perror("accept");
-        exit(1);
-    }
-    else{
-        printf("Player 1 Connected at %s\n", inet_ntoa(main->dest.sin_addr));
+    printf("Waiting for Player 2 to connect\n");
+    server->clientSocket2 = accept(server->socketFd, (struct sockaddr*)&server->address, &server->addressSize);
+
+    if (server->clientSocket2 < 0) {
+        internalLog("Player 2 accept error");
+        exit(0);
     }
 
-    if ((main->client2_fd = accept(main->socket_fd, (struct sockaddr *)&main->dest, &main->size))==-1 ) {
-        perror("accept");
-        exit(1);
-    }
-    else{        
-        printf("Player 2 Connected at %s\n", inet_ntoa(main->dest.sin_addr));
-    }
+    fcntl(server->clientSocket1, F_SETFL, FNDELAY);
+    fcntl(server->clientSocket2, F_SETFL, FNDELAY);
 
-   
-    fcntl(main->client1_fd, F_SETFL, fcntl(main->client1_fd, F_GETFL, 0) | O_NONBLOCK);
-    fcntl(main->client2_fd, F_SETFL, fcntl(main->client2_fd, F_GETFL, 0) | O_NONBLOCK);  
+    internalLog("Both players connected");
 }
 
-int networkGetch(ServerConnection* main, bool isPlayerOne) {
-    if(isPlayerOne){
-        if ((main->num = recv(main->client1_fd, main->buffer, 4, /*MSG_DONTWAIT*/ 0)) == -1) {
-            return 0; 
-        }
-    } else {
-        if ((main->num = recv(main->client2_fd, main->buffer, 4, /*MSG_DONTWAIT*/ 0)) == -1) {
-            return 0; 
-        }
+int getClientData(int socketFd) {
+    int val = 0;
+    
+    int ret = read(socketFd, &val, sizeof(val));
+    if (ret == 0) {
+        return -1;
     }
-    return ((((int)main->buffer[2]) << 16) | (((int)main->buffer[1]) << 8) | ((int) main->buffer[0]));
+    //read(socketFd, &val, 0);
+    return val;
 }
 
-void sendServerData(ServerConnection* main, bool isPlayerOne){
-    char* buff = getScreenArray();
-    if(isPlayerOne){
-        if ((send(main->client1_fd, buff, MAP_HEIGHT * MAP_WIDTH * 2,0))== -1){
-            fprintf(stderr, "Failure Sending Message\n");
-            close(main->client1_fd);
-        }
-    }
-    else{
-        if ((send(main->client2_fd, buff, MAP_HEIGHT * MAP_WIDTH * 2,0))== -1){
-            fprintf(stderr, "Failure Sending Message\n");
-            close(main->client2_fd);
-        }
-    }
+void sendClientData(int socketFd, char buffer[], int size) {
+    send(socketFd, buffer, size, 0);
 }
 
-void closeServer(ServerConnection* main) {
-    close(main->client1_fd);
-    close(main->client2_fd);
-    close(main->socket_fd);
+void closeServer(ServerConnection* server) {
+    close(server->clientSocket1);
+    close(server->clientSocket2);
+
+    shutdown(server->socketFd, SHUT_RDWR);
 }
 
-void initClient(ClientConnection* main, char* address){   
-    if ((main->he = gethostbyname(address))==NULL) {
-        fprintf(stderr, "Cannot get host name\n");
-        exit(1);
+
+void initClient(ClientConnection* client, char* address, int port) {
+    client->socketFd = socket(AF_INET, SOCK_STREAM, 0);
+
+    if (client->socketFd < 0) {
+        internalLog("Failed to init socket");
+        exit(0);
     }
 
-    if ((main->socket_fd = socket(AF_INET, SOCK_STREAM, 0))== -1) {
-        fprintf(stderr, "Socket Failure!!\n");
-        exit(1);
+    memset(&client->address, 0, sizeof(client->address));
+    client->address.sin_family = AF_INET;
+    client->address.sin_port = htons(port);
+
+    client->addressSize = sizeof(client->address);
+
+    int ret = inet_pton(AF_INET, address, &client->address.sin_addr);
+    
+    if (ret <= 0) {
+        internalLog("Failed to convert from text to binary");
     }
 
-    memset(&main->server_info, 0, sizeof(main->server_info));
-    main->server_info.sin_family = AF_INET;
-    main->server_info.sin_port = htons(PORT);
-    main->server_info.sin_addr = *((struct in_addr *)main->he->h_addr);
-    if (connect(main->socket_fd, (struct sockaddr *)&main->server_info, sizeof(struct sockaddr))<0) {
-        perror("connect");
-        exit(1);
+    //char service[50];
+    //sprintf(service, "%i", port);
+
+    //struct addrinfo* results;
+    //ret = getaddrinfo(address, service, (struct addrinfo) &client->address, &results); 
+    //ret = getnameinfo((struct sockaddr*) &client->address, client->addressSize, address, strlen(address), NULL, 0, 0);
+
+    //int ret = inet_pton(AF_INET, address, &client->address.sin_addr);
+
+    //if (ret != 0) {
+    //    //internalLog("Invalid or unsupported address");
+    //    internalLog(gai_strerror(ret));
+    //    exit(0);
+    //}
+
+
+    client->clientFd = connect(client->socketFd, (struct sockaddr*) &client->address, client->addressSize);
+
+    if (client->clientFd < 0) {
+        internalLog("Failed to connect");
+        exit(0);
     }
+
+    fcntl(client->clientFd, F_SETFL, FNDELAY);
 }
 
-void clientPut(ClientConnection* main, int data) {
-    //printf("Client: Enter Data for Server:\n");
-    main->buffer[0] = (char) data;
-    main->buffer[1] = (char) (data >> 8);
-    main->buffer[2] = (char) (data >> 16);
-    main->buffer[3] = 0;
-
-    mvprintw(0,0,"%i", data); 
-    mvprintw(1,0,"%i", (((((int)main->buffer[2])) << 16) | (((int)main->buffer[1]) << 8) | ((int) main->buffer[0])));
-
-
-    if ((send(main->socket_fd,main->buffer, /*strlen(main->buffer)*/ 4,0))== -1) {
-            fprintf(stderr, "Failure Sending Message\n");
-    }
+void getServerData(ClientConnection* client, char buffer[], int size) {
+    read(client->socketFd, buffer, size);
 }
 
-void receiveServerData(ClientConnection* main){
-    char* buff = getScreenArray();
-    if(recv(main->socket_fd, buff, MAP_HEIGHT * MAP_WIDTH * 2,0) <= 0){
-        printf("Either Connection Closed or Error\n");
-    }
+void sendServerData(ClientConnection* client, int val) {
+    send(client->socketFd, &val, sizeof(val), 0);
 }
 
-void closeClient(ClientConnection* main) {
-    close(main->socket_fd);
+void closeClient(ClientConnection* client) {
+    close(client->clientFd);
 }
+

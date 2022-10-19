@@ -1,3 +1,4 @@
+#include "io.h"
 #include "jrombk.h"
 #include "network.h"
 #include <curses.h>
@@ -17,7 +18,7 @@ int main(int argc, char *argv[]) {
     ClientConnection connection;
 
     if (strcmp(argv[1], "-S") == 0) {
-        initServer(&server);
+        initServer(&server, PORT);
         //initServer(&server2);
         isServer = true;
     } else if (strcmp(argv[1], "-C") == 0) {
@@ -25,7 +26,7 @@ int main(int argc, char *argv[]) {
             printf("Invalid Arguments\n");
             return 1;
         }
-        initClient(&connection, argv[2]);
+        initClient(&connection, argv[2], PORT);
         isServer = false;
     } else {
         return 1;
@@ -50,9 +51,13 @@ int main(int argc, char *argv[]) {
         while (command0 != 'q') {
             frameStart = clock();
             command0 = getch();
+            //getch();
+            //command0 = 'b';
 
-            command1 = networkGetch(&server, true);
-            command2 = networkGetch(&server, false);
+            //command1 = networkGetch(&server, true);
+            //command2 = networkGetch(&server, false);
+            command1 = getClientData(server.clientSocket1);
+            command2 = getClientData(server.clientSocket2);
 
             if (command0 == 'r') {
                 generateMap();
@@ -62,8 +67,10 @@ int main(int argc, char *argv[]) {
             printScreen(false);
             printScreenCharArray();
 
-            sendServerData(&server, true);
-            sendServerData(&server, false);
+            //sendServerData(&server, true);
+            //sendServerData(&server, false);
+            sendClientData(server.clientSocket1, getScreenArray(), MAP_WIDTH * MAP_HEIGHT * 2);
+            sendClientData(server.clientSocket2, getScreenArray(), MAP_WIDTH * MAP_HEIGHT * 2);
 
             mvprintw(0, 0, "%i", command1);
             mvprintw(1, 0, "%i", command0);
@@ -82,12 +89,19 @@ int main(int argc, char *argv[]) {
             command1 = getch();
           
             if (command1 != ERR) {
-                clientPut(&connection, command1);
+                //clientPut(&connection, command1);
+                sendServerData(&connection, command1);
             }
            
-            receiveServerData(&connection);
+            //receiveServerData(&connection);
+            
+            getServerData(&connection, getScreenArray(), MAP_WIDTH * MAP_HEIGHT * 2);
             
             printScreenCharArray();
+            if (command1 != -1) {
+                //clear();
+                mvprintw(0,0, "%i\n", command1);
+            }
         }
         closeClient(&connection);
     }
