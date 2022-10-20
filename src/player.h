@@ -11,6 +11,7 @@ typedef struct Player {
     Bomb bombs[3];
     int y;
     int x;
+    bool moving;
 } Player;
 
 

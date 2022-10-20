@@ -43,30 +43,30 @@ int main(int argc, char *argv[]) {
     generateMap();
 
 
-    int command0 = 0;
+    //int command0 = 0;
     int command1 = 0;
     int command2 = 0;
     if (isServer) {
-        while (command0 != 'q') {
+        while (1){//command0 != 'q') {
             frameStart = clock();
-            command0 = getch();
+            //command0 = getch();
 
             command1 = networkGetch(&server, true);
             command2 = networkGetch(&server, false);
 
-            if (command0 == 'r') {
-                generateMap();
-            }
+            //if (command0 == 'r') {
+            //    generateMap();
+            //}
 
             gameLoop(command1, command2);
             printScreen(false);
-            printScreenCharArray();
+            //printScreenCharArray();
 
             sendServerData(&server, true);
             sendServerData(&server, false);
 
-            mvprintw(0, 0, "%i", command1);
-            mvprintw(1, 0, "%i", command0);
+            //mvprintw(0, 0, "%i", command1);
+            //mvprintw(1, 0, "%i", command2);
 
             clock_t frameLen = 0;
             do {
@@ -75,6 +75,7 @@ int main(int argc, char *argv[]) {
         }
         closeServer(&server);
     } else {
+        initNcurses();
         while (command1 != 'q') {
             frameStart = clock();
             //do {
