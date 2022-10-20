@@ -1,4 +1,5 @@
 #include "game.h"
+#include "jrombk.h"
 #include <curses.h>
 
 
@@ -163,9 +164,11 @@ void handlePlayerInput(int cmd, Player* player) {
             movePlayer(RIGHT, player);
             break;
         case 'b':
+            internalLog(SERVER_LOG, "Drop a bomb\n");
             dropBomb(player);
             break;
         case 'v':
+            internalLog(SERVER_LOG,"Place a wall\n");
             placeWall(player);
             break;
     }
@@ -173,10 +176,14 @@ void handlePlayerInput(int cmd, Player* player) {
 
 
 void gameLoop(int input1, int input2) {
+    internalLog(SERVER_LOG,"Handle player 1 input\n");
     handlePlayerInput(input1, &player1);
+    internalLog(SERVER_LOG,"Handle player 2 input\n");
     handlePlayerInput(input2, &player2);
 
+    internalLog(SERVER_LOG,"Handle player 1 bombs\n");
     handlePlayerBombs(&player1);
+    internalLog(SERVER_LOG,"Handle player 2 bombs\n");
     handlePlayerBombs(&player2);
 
     if (player1.isDead) {

@@ -8,7 +8,13 @@
 #include <string.h>
 
 extern clock_t frameStart;
+extern bool debug;
 
+#define SERVER_LOG "server_log.txt"
+#define CLIENT_LOG "client_log.txt"
+
+
+#include "misc.h"
 #include "bombs.h"
 #include "generate.h"
 #include "player.h"
