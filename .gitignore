@@ -1,5 +1,5 @@
 # Project
-src/jrombk
+build/*
 
 # Prerequisites
 *.d
