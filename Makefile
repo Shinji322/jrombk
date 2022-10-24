@@ -8,4 +8,4 @@ OUTPUT_FILE=jrombk
 
 main:
 	@mkdir -p build
-	$(CC) $(SOURCE_FILES) -o build/$(OUTPUT_FILE) $(LIBS)
+	$(CC) $(SOURCE_FILES) -g -o build/$(OUTPUT_FILE) $(LIBS)

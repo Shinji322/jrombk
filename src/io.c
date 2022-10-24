@@ -141,7 +141,7 @@ void printScreen(bool toScreen) {
 void printScreenCharArray() {
     for (int y = 0; y < MAP_HEIGHT; y++) {
         for (int x = 0; x < MAP_WIDTH; x++) {
-            attron(COLOR_PAIR(screenAsChar[1][y][x]));
+            // attron(COLOR_PAIR(screenAsChar[1][y][x]));
             mvprintw(y,x, "%c", screenAsChar[0][y][x]);
             attrset(A_NORMAL);
         }

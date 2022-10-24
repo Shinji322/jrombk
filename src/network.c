@@ -15,7 +15,7 @@ void initServer(ServerConnection* main){
         exit(1);
     }
 
-    memset(&main->server, 0, sizeof(&main->server));
+    memset(&main->server, 0, sizeof(main->server));
     memset(&main->dest,0,sizeof(main->dest));
 
 
