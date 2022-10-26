@@ -2,6 +2,113 @@
 #include "io.h"
 #include "compress.h"
 
+//Used by server to compress and send data back to clients:while
+void sendServerData(ServerConnection* main, bool isPlayerOne){
+    char* buff = getScreenArray();
+    int size = 0;
+    char* compBuff = compress(buff, MAP_SIZE, &size);
+    if(isPlayerOne){
+        if ((send(main->client1_fd, (const void*) &size, sizeof(size_t),0))== -1){
+            fprintf(stderr, "Failure Sending Message\n");
+            close(main->client1_fd);
+        }
+        if ((send(main->client1_fd, compBuff, strlen(compBuff),0))== -1){
+            fprintf(stderr, "Failure Sending Message\n");
+            close(main->client1_fd);
+        }
+    }
+    else{
+        if ((send(main->client2_fd, (const void*) &size, sizeof(size_t),0))== -1){
+            fprintf(stderr, "Failure Sending Message\n");
+            close(main->client2_fd);
+        }
+        if ((send(main->client2_fd, compBuff, strlen(compBuff),0))== -1){
+            fprintf(stderr, "Failure Sending Message\n");
+            close(main->client2_fd);
+        }
+    }
+}
+
+//Used by client to receive main array back from server
+int receiveServerData(ClientConnection* main){
+    char* buff = getScreenArray();
+    int size;
+    if(recv(main->socket_fd, &size, sizeof(size_t),0) <= 0){
+        //printf("Either Connection Closed or Error\n");
+        return -1;
+    }
+
+    char* compBuff = malloc(size * sizeof(char));
+    int ret = -1;
+    do {
+        ret = recv(main->socket_fd, compBuff, size,0);
+    } while (ret == -1);
+
+    decompress(compBuff, size, buff, MAP_SIZE);
+ 
+    return 1;
+}
+
+//Used by server to receive key inputs sent from @clientPut
+int networkGetch(ServerConnection* main, bool isPlayerOne) {
+    if(isPlayerOne){
+        if ((main->num = recv(main->client1_fd, main->buffer, 4, 0)) == -1) {
+            return 0; 
+        }
+    } else {
+        if ((main->num = recv(main->client2_fd, main->buffer, 4, 0)) == -1) {
+            return 0; 
+        }
+    }
+    return ((((int)main->buffer[2]) << 16) | (((int)main->buffer[1]) << 8) | ((int) main->buffer[0]));
+}
+
+//Used by client to send key input to server
+void clientPut(ClientConnection* main, int data) {
+    main->buffer[0] = (char) data;
+    main->buffer[1] = (char) (data >> 8);
+    main->buffer[2] = (char) (data >> 16);
+    main->buffer[3] = 0;
+
+    //mvprintw(0,0,"%i", main->buffer); 
+    //mvprintw(1,0,"%i", (((((int)main->buffer[2])) << 16) | (((int)main->buffer[1]) << 8) | ((int) main->buffer[0])));
+
+    if ((send(main->socket_fd,main->buffer, 4,0))== -1) {
+           //fprintf(stderr, "Failure Sending Message\n");
+    }
+}
+
+//
+//
+//
+// Network Setup Below
+//
+//
+//
+
+void initClient(ClientConnection* main, char* address){   
+    if ((main->he = gethostbyname(address))==NULL) {
+        fprintf(stderr, "Cannot get host name\n");
+        exit(1);
+    }
+
+    if ((main->socket_fd = socket(AF_INET, SOCK_STREAM, 0))== -1) {
+        fprintf(stderr, "Socket Failure!!\n");
+        exit(1);
+    }
+
+    memset(&main->server_info, 0, sizeof(main->server_info));
+    main->server_info.sin_family = AF_INET;
+    main->server_info.sin_port = htons(PORT);
+    main->server_info.sin_addr = *((struct in_addr *)main->he->h_addr);
+    if (connect(main->socket_fd, (struct sockaddr *)&main->server_info, sizeof(struct sockaddr))<0) {
+        perror("connect");
+        exit(1);
+    }
+
+    fcntl(main->socket_fd, F_SETFL, fcntl(main->socket_fd, F_GETFL, 0) | O_NONBLOCK);
+}
+
 void initServer(ServerConnection* main){
     int yes =1;
 
@@ -57,113 +164,12 @@ void initServer(ServerConnection* main){
     fcntl(main->client2_fd, F_SETFL, fcntl(main->client2_fd, F_GETFL, 0) | O_NONBLOCK);  
 }
 
-int networkGetch(ServerConnection* main, bool isPlayerOne) {
-    if(isPlayerOne){
-        if ((main->num = recv(main->client1_fd, main->buffer, 4, /*MSG_DONTWAIT*/ 0)) == -1) {
-            return 0; 
-        }
-    } else {
-        if ((main->num = recv(main->client2_fd, main->buffer, 4, /*MSG_DONTWAIT*/ 0)) == -1) {
-            return 0; 
-        }
-    }
-    return ((((int)main->buffer[2]) << 16) | (((int)main->buffer[1]) << 8) | ((int) main->buffer[0]));
-}
-
-void sendServerData(ServerConnection* main, bool isPlayerOne){
-    char* buff = getScreenArray();
-    int size = 0;
-    char* compBuff = compress(buff, MAP_HEIGHT * MAP_WIDTH * 2, &size);
-    //size_t size = strlen(compBuff);
-    if(isPlayerOne){
-        //if ((send(main->client1_fd, buff, MAP_HEIGHT * MAP_WIDTH /** 2*/,0))== -1){
-        if ((send(main->client1_fd, (const void*) &size, sizeof(size_t),0))== -1){
-            fprintf(stderr, "Failure Sending Message\n");
-            close(main->client1_fd);
-        }
-        if ((send(main->client1_fd, compBuff, strlen(compBuff),0))== -1){
-            fprintf(stderr, "Failure Sending Message\n");
-            close(main->client1_fd);
-        }
-    }
-    else{
-        //if ((send(main->client2_fd, buff, MAP_HEIGHT * MAP_WIDTH /** 2*/,0))== -1){
-        if ((send(main->client2_fd, (const void*) &size, sizeof(size_t),0))== -1){
-            fprintf(stderr, "Failure Sending Message\n");
-            close(main->client2_fd);
-        }
-        if ((send(main->client2_fd, compBuff, strlen(compBuff),0))== -1){
-            fprintf(stderr, "Failure Sending Message\n");
-            close(main->client2_fd);
-        }
-    }
+void closeClient(ClientConnection* main) {
+    close(main->socket_fd);
 }
 
 void closeServer(ServerConnection* main) {
     close(main->client1_fd);
     close(main->client2_fd);
-    close(main->socket_fd);
-}
-
-void initClient(ClientConnection* main, char* address){   
-    if ((main->he = gethostbyname(address))==NULL) {
-        fprintf(stderr, "Cannot get host name\n");
-        exit(1);
-    }
-
-    if ((main->socket_fd = socket(AF_INET, SOCK_STREAM, 0))== -1) {
-        fprintf(stderr, "Socket Failure!!\n");
-        exit(1);
-    }
-
-    memset(&main->server_info, 0, sizeof(main->server_info));
-    main->server_info.sin_family = AF_INET;
-    main->server_info.sin_port = htons(PORT);
-    main->server_info.sin_addr = *((struct in_addr *)main->he->h_addr);
-    if (connect(main->socket_fd, (struct sockaddr *)&main->server_info, sizeof(struct sockaddr))<0) {
-        perror("connect");
-        exit(1);
-    }
-
-    fcntl(main->socket_fd, F_SETFL, fcntl(main->socket_fd, F_GETFL, 0) | O_NONBLOCK);
-}
-
-void clientPut(ClientConnection* main, int data) {
-    //printf("Client: Enter Data for Server:\n");
-    main->buffer[0] = (char) data;
-    main->buffer[1] = (char) (data >> 8);
-    main->buffer[2] = (char) (data >> 16);
-    main->buffer[3] = 0;
-
-    mvprintw(0,0,"%i", data); 
-    mvprintw(1,0,"%i", (((((int)main->buffer[2])) << 16) | (((int)main->buffer[1]) << 8) | ((int) main->buffer[0])));
-
-
-    if ((send(main->socket_fd,main->buffer, /*strlen(main->buffer)*/ 4,0))== -1) {
-           //fprintf(stderr, "Failure Sending Message\n");
-    }
-}
-
-int receiveServerData(ClientConnection* main){
-    char* buff = getScreenArray();
-    int size;
-    if(recv(main->socket_fd, &size, sizeof(size_t),0) <= 0){
-        //printf("Either Connection Closed or Error\n");
-        return -1;
-    }
-
-    char* compBuff = malloc(size * sizeof(char));
-    int ret = -1;
-    do {
-        ret = recv(main->socket_fd, compBuff, size,0);
-    } while (ret == -1);
-
-    decompress(compBuff, size, buff, MAP_HEIGHT * MAP_WIDTH * 2);
-
-        
-    return 1;
-}
-
-void closeClient(ClientConnection* main) {
     close(main->socket_fd);
 }

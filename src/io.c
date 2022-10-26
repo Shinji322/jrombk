@@ -1,9 +1,6 @@
 #include "io.h"
 #include <curses.h>
 #include <stdarg.h>
-//#include <libioP.h>
-
-
 
 char screenAsChar[2][MAP_HEIGHT][MAP_WIDTH] = {COLOR_WHITE};
 

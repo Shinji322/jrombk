@@ -6,6 +6,8 @@
 
 #define MAP_RADIUS 16
 
+#define MAP_SIZE (MAP_WIDTH * MAP_HEIGHT * 2)
+
 
 #define NUMBER_OF_TILE_TYPES 7
 
