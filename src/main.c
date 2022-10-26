@@ -1,7 +1,9 @@
 #include "jrombk.h"
 #include "misc.h"
 #include "network.h"
+#include <asm-generic/errno-base.h>
 #include <curses.h>
+#include <errno.h>
 
 #define MS_PER_FRAME (CLOCKS_PER_SEC / 60)
 
@@ -15,6 +17,7 @@ int main(int argc, char *argv[]) {
         printf("Invalid Arguments\n");
         return 1;
     }
+    sigaction(SIGPIPE, &(struct sigaction){SIG_IGN}, NULL);
 
     bool isServer = true;
     ServerConnection server;
@@ -84,6 +87,10 @@ int main(int argc, char *argv[]) {
             internalLog(SERVER_LOG,"Send data to player 1");
             sendServerData(&server, false);
 
+            if (errno == ECONNRESET || errno == EPIPE) {
+                break;
+            }
+
             //mvprintw(0, 0, "%i", command1);
             //mvprintw(1, 0, "%i", command0);
 
@@ -107,6 +114,9 @@ int main(int argc, char *argv[]) {
             if (command1 != ERR) {
                 internalLog(CLIENT_LOG,"Send command to server\n");
                 clientPut(&connection, command1);
+                if (errno == ECONNRESET | errno == EPIPE) {
+                    break;
+                }
             }
            
             internalLog(CLIENT_LOG,"Try and receive data from server\n");

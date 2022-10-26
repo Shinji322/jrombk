@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <signal.h>
 
 extern clock_t frameStart;
 extern bool debug;
