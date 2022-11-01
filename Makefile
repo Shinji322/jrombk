@@ -1,6 +1,6 @@
 CC=gcc
 
-LIBS=-lncurses -lm
+LIBS=-lncurses -lX11 -lm
 
 SOURCE_FILES=$(wildcard src/*.c)
 
